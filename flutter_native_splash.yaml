@@ -1,0 +1,19 @@
+flutter_native_splash:
+
+  android: true
+  ios: true
+  web: false
+  linux: false
+  windows: false
+  macos: false
+
+  color: "#ECF2FF"
+  image: assets/images/Image_sets.png
+
+  branding: assets/images/Image_sets.png
+  branding_mode: center
+
+  android_12:
+    color: "#ECF2FF"
+    icon_background_color: "#ECF2FF"
+    image: assets/images/Image_sets.png
