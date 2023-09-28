@@ -15,7 +15,7 @@ class FirebaseApi{
     await _firebaseMessaging.requestPermission();
     final fCMToken= await _firebaseMessaging.getToken();
     print('Token$fCMToken');
-    final String apiUrl = ip+'/polls/InsertClientToken';
+    const String apiUrl = '$ip/polls/InsertClientToken';
     final Map<String, dynamic> requestData = {
       'token': fCMToken,
     };

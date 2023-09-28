@@ -159,6 +159,7 @@
   "paiemnet_button1": "Avec Visa ou MasterCard",
   "paiemnet_button2": "Avec Cach",
   "paiement_message1": "chargement",
+  "paument_messsage3": "Nous vous informons que vous avez 24 heures pour nous appeler concernant votre demande.\n Si nous ne recevons pas votre appel dans ce délai, votre demande sera supprimée.\n\nNous vous remercions de votre attention rapide à cette question.\n\nCordialement,",
   "web_Paiemnet_titel": "Paiement avec Konnect",
   "web_Paiemnet_message1": "Votre demande est passe Succès",
   "web_Paiemnet_message2": "Succès du paiement",

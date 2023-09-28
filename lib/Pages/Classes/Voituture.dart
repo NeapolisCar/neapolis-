@@ -45,8 +45,8 @@ class Voiture {
         annee: json['annee'],
         etat: json['etat'],
         marque:json['marque'],
-        photoMarque :ip + json['photoMarque'],
-        photo: ip + json['photo'],
+        photoMarque : json['photoMarque'],
+        photo: json['photo'],
         disponibilite: json['disponibilite']
     );
   }

@@ -54,7 +54,7 @@ class Client {
       photo_parmis:
           (json['photo_parmis'] != null) ? ip + json['photo_parmis'] : '',
       photo_cin_passport: (json['photo_cin_passport'] != null)
-          ? ip + json['photo_cin_passport']
+          ?  json['photo_cin_passport']
           : '',
       points: json['points']?.toString() ?? '',
       photo: (json['photo'] != null) ? ip + json['photo'] : '',

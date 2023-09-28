@@ -7,7 +7,7 @@ class datepicker extends StatefulWidget {
   TextEditingController date = TextEditingController();
   EdgeInsets margin =EdgeInsets.zero;
   String text ="";
-  datepicker({
+  datepicker({super.key, 
     required this.date,
     required this.margin,
     required this.text,
@@ -35,7 +35,7 @@ class _datepickerState extends State<datepicker> {
       child:TextField(
           controller: date,
           decoration: InputDecoration(
-            icon:Padding(
+            icon:const Padding(
               padding: EdgeInsets.only(left: 8.0), // Adjust the padding as needed
               child: Icon(Icons.calendar_today),
             ),

@@ -36,7 +36,7 @@ class _ParametresState extends State<Parametres> {
     "Arabic",
     "English",
   ];
-  late int _selectedIndex = 0;
+  late int _selectedIndex = 1;
   late int _selectedIndex1=0;
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();

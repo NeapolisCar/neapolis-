@@ -29,7 +29,7 @@ class Post {
       date_depart: json['date_depart'],
       date_fin: json['date_fin'],
       lien: json['lien'],
-      photo: ip + json['photo'],
+      photo: json['photo'],
     );
   }
 }

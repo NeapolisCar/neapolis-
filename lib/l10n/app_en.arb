@@ -184,6 +184,7 @@
   "paiemnet_button1": "With Visa or MasterCard",
   "paiemnet_button2": "With Cash",
   "paiement_message1": "loading",
+  "paument_messsage3":"Please be advised that you have 24 hours to call us regarding your request.\n If we do not receive your call within this time frame, your request will be deleted.\n\nThank you for your prompt attention to this matter.\n\nSincerely,",
   "web_Paiemnet_titel": "Payment with Konnect",
   "web_Paiemnet_message1": "Your request has been submitted successfully",
   "web_Paiemnet_message2": "Payment Successful",

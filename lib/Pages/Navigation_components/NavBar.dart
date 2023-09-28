@@ -3,7 +3,6 @@
 // ignore_for_file: unnecessary_import
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:neapolis_car/Pages/Classes/Client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -115,27 +114,15 @@ class NavBarState extends State<NavBar> {
       backgroundColor: Colors.red,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: FaIcon(
-            FontAwesomeIcons.house,
-            color: Colors.black,
-            size: 30,
-          ),
+          icon: Icon(Icons.home),
           label: translation(context).accueil,
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(
-            FontAwesomeIcons.carSide,
-            color: Colors.black,
-            size: 30,
-          ),
+          icon: Icon(Icons.car_crash),
           label: translation(context).post_title,
         ),
         BottomNavigationBarItem(
-          icon: FaIcon(
-            FontAwesomeIcons.circleUser,
-            color: Colors.black,
-            size: 24,
-          ),
+          icon: Icon(Icons.person_2_outlined),
           label: _nomprenom != '' ? _nomprenom : translation(context).visture,
         ),
       ],

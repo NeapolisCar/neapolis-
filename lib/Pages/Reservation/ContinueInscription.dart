@@ -43,6 +43,7 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
   late String _type = "";
   late int _id =0;
   late int index = 0;
+  @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     final arguments =
@@ -230,6 +231,7 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
     }
   }
 
+  @override
   void initState() {
     super.initState();
     _loadId();
@@ -244,17 +246,17 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
             MyAppBar(Title: translation(context).contunier_inscription_title),
       ),
       body: Container(
-        decoration: BoxDecoration(),
+        decoration: const BoxDecoration(),
         child: SingleChildScrollView(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Text(
               translation(context).contunier_inscription_text,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Colors.red,
@@ -264,7 +266,7 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Container(
@@ -277,14 +279,14 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        prefixIcon: Icon(Icons.numbers),
+                        prefixIcon: const Icon(Icons.numbers),
                         // suffixIcon: Icon(
                         //   Icons.error,
                         // ),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Container(
@@ -298,18 +300,18 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        prefixIcon: Icon(Icons.factory),
+                        prefixIcon: const Icon(Icons.factory),
                         // suffixIcon: Icon(
                         //   Icons.error,
                         // ),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
                     height: 50,
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
@@ -324,10 +326,10 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(left: 16),
+                            padding: const EdgeInsets.only(left: 16),
                             child: Text(
                               translation(context).inscriotion_photoParmi,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -350,7 +352,7 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Row(

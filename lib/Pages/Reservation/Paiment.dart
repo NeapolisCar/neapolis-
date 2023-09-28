@@ -314,7 +314,6 @@ class _PiamentState extends State<Piament> {
         }
     }
   }
-
   void Dialog() {
     showDialog(
       context: context,
@@ -333,6 +332,9 @@ class _PiamentState extends State<Piament> {
                           _nomprenom +
                           translation(context).paiemnet_CR,
                       style: TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      translation(context).paument_messsage3
                     ),
                     SizedBox(height: 10),
                     Row(

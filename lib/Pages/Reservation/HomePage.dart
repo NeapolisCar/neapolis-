@@ -34,8 +34,8 @@ class MyHomePage extends StatelessWidget {
               Center(
                 child: Column(
                   children: <Widget>[
-                    SizedBox(height: 100.0),
-                    SizedBox(
+                    const SizedBox(height: 100.0),
+                    const SizedBox(
                       width: 380,
                       height: 166,
                       child: Text(
@@ -49,27 +49,26 @@ class MyHomePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     Image.asset(
                       'assets/images/img_logoneapolisv444_97x137.png',
                       alignment: Alignment.topCenter,
                       width: 583,
                       height: 144,
                     ),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/login');
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.white,
-                        onPrimary: Colors.black,
+                        foregroundColor: Colors.black, backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           side: BorderSide.none,
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.all(10.0),
                         child: Text(
                           "Login/Inscriptions",
@@ -84,20 +83,19 @@ class MyHomePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 32.0),
+                    const SizedBox(height: 32.0),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/reservation');
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.white,
-                        onPrimary: Colors.black,
+                        foregroundColor: Colors.black, backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           side: BorderSide.none,
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.all(10.0),
                         child: Text(
                           "Utiliser comme visiteur",

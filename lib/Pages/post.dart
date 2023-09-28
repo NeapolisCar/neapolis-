@@ -18,7 +18,7 @@ class ListPost extends StatefulWidget {
 
 class _ListPostState extends State<ListPost> {
   List<Post> _Posts = [];
-  late int _selectedIndex = 1;
+  late final int _selectedIndex = 1;
   late String id = '';
   Future<void> fetchPost() async {
     final response = await http.post(
@@ -73,12 +73,12 @@ class _ListPostState extends State<ListPost> {
                         title: Text(translation(context).post_type + post.type),
                         children: [
                           Text(post.descriptions),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(translation(context).post_date_depart +
                               post.date_depart.toString()),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(translation(context).post_date_fin +
@@ -88,7 +88,7 @@ class _ListPostState extends State<ListPost> {
                     ],
                   ))).toList(),
             )
-          : CircularProgressIndicator(),
+          : const CircularProgressIndicator(),
       bottomNavigationBar: NavBar(
         selectedIndex: _selectedIndex,
       ),

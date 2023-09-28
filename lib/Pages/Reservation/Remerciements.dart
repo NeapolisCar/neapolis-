@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:neapolis_car/Pages/Navigation_components/MyDrawer.dart';
 import 'package:neapolis_car/Pages/Navigation_components/NavBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 import 'package:neapolis_car/main.dart';
 
@@ -19,7 +18,7 @@ class Remerciements extends StatefulWidget {
 }
 
 class _RemerciementsState extends State<Remerciements> {
-  late int _selectedIndex = 0;
+  late final int _selectedIndex = 0;
   late List<Client> _Client = [];
   late int id = 0;
   late String _nomprenom = 'Visture';
@@ -90,14 +89,14 @@ class _RemerciementsState extends State<Remerciements> {
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 2,
                   blurRadius: 5,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), // changes position of shadow
                 ),
               ],
             ),
             child: Center(
               child: Text(
                 translation(context).remerciements_text1,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w400,
                 ),

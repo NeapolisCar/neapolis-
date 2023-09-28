@@ -339,7 +339,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
             fontSize: 16.0);
       } else if (reponse == "email déjà utilisé") {
         Fluttertoast.showToast(
-            msg: "email déjà utilisé",
+            msg:  translation(context).inscriotion_message13,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 1,
@@ -509,6 +509,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
         hasDigits &&
         hasSpecialCharacters;
   }
+  @override
   void initState() {
     super.initState();
     initNotifications();

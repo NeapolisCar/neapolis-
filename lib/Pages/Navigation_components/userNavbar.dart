@@ -1,7 +1,6 @@
 // ignore_for_file: unused_local_variable, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -92,19 +91,11 @@ class _UserNavBarState extends State<UserNavBar> {
       backgroundColor: Colors.red,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-        icon: FaIcon(
-          FontAwesomeIcons.clipboardList,
-          color: Colors.black,
-          size: 24,
-        ),
+        icon: Icon(Icons.list_alt),
         label: translation(context).historique_title,
       ),
       BottomNavigationBarItem(
-        icon: FaIcon(
-          FontAwesomeIcons.gear,
-          color: Colors.black,
-          size: 24,
-        ),
+        icon: Icon(Icons.settings),
         label: _nomprenom ,
       ),
       ],
