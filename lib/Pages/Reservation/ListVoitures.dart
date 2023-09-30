@@ -89,7 +89,11 @@ class _ListVoituresState extends State<ListVoitures> {
                             .caption!
                             .apply(fontWeightDelta: 5, color: Colors.red)),
                     CheckboxListTile(
-                      title: Text(translation(context).details_voiture_RA),
+                      title: Text(translation(context).details_voiture_RA,
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption!
+                              .apply(fontWeightDelta: 5)),
                       value: _acceptRole,
                       onChanged: (newValue) {
                         setState(() {
@@ -105,7 +109,8 @@ class _ListVoituresState extends State<ListVoitures> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text(translation(context).details_voiture_RAn),
+                  child: Text(translation(context).details_voiture_RAn,
+                      style:Theme.of(context).textTheme.button),
                 ),
                 SizedBox(width: 20),
                 ElevatedButton(
@@ -113,7 +118,8 @@ class _ListVoituresState extends State<ListVoitures> {
                       ? () {
                     Conferme(numeroSeries , modele , photo);
                   } : null,
-                  child: Text(translation(context).details_voiture_Rbutton),
+                  child: Text(translation(context).details_voiture_Rbutton,
+                      style:Theme.of(context).textTheme.button),
                 ),
               ],
             );

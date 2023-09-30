@@ -31,6 +31,8 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
   String? _location_de_rammaser;
   String? _location_de_revenir;
   int _days = 1;
+  double _prix = 0;
+  double _caution = 0;
   String _numeroSeries = "";
   double _prixToutal = 0;
   double _prixJour = 0;
@@ -335,6 +337,8 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
           _location_de_rammaser = arguments['location_de_rammaser'] as String;
           _location_de_revenir = arguments['location_de_revenir'] as String;
           _days = arguments['days'] as int;
+          _caution = arguments['caution'] as double;
+          _prix = arguments['prix'] as double;
           _numeroSeries = arguments['numeroSeries'] as String;
           _prixJour = arguments['prixJour'] as double;
           _prixToutal = arguments['prixToutal'] as double;
@@ -397,6 +401,8 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
                   'location_de_rammaser': _location_de_rammaser,
                   'location_de_revenir': _location_de_revenir,
                   'days': _days,
+                  'caution': _caution,
+                  'prix':_prix,
                   'numeroSeries': _numeroSeries,
                   'prixToutal': _prixToutal,
                   'modele': _modele,
@@ -465,6 +471,8 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
                                       'location_de_rammaser': _location_de_rammaser,
                                       'location_de_revenir': _location_de_revenir,
                                       'days': _days,
+                                      'caution': _caution,
+                                      'prix':_prix,
                                       'numeroSeries': _numeroSeries,
                                       'prixToutal': _prixToutal,
                                       'modele': _modele,
@@ -543,19 +551,6 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
                                 this.progress = progress / 100;
                               });
                             },
-                      onPageFinished: (String url) {
-
-                        // Evaluate the JavaScript code to click the element with the name "bank_card".
-                        clickButton();
-                        Fluttertoast.showToast(
-                            msg: "error",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.TOP,
-                            timeInSecForIosWeb: 10,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      },
                           )
                         : Center(
                             child: CircularProgressIndicator(),

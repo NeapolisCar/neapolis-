@@ -29,7 +29,7 @@ class Demande {
     return Demande(
       id: json['id'] ?? '',
       type: json['type'] ?? '',
-      photo: (json['photo'] != null) ? ip + json['photo'] : '',
+      photo: (json['photo'] != null) ? json['photo'] : '',
       modele: json['modele'] ?? '',
       prix: json['prix'] ?? '',
       etat: json['etat'] ?? '',

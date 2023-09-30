@@ -57,7 +57,7 @@ class Client {
           ?  json['photo_cin_passport']
           : '',
       points: json['points']?.toString() ?? '',
-      photo: (json['photo'] != null) ? ip + json['photo'] : '',
+      photo: (json['photo'] != null) ? json['photo'] : '',
     );
   }
 }

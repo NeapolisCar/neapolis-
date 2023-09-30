@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, duplicate_ignore, use_build_context_synchronously, prefer_const_constructors
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
@@ -43,36 +45,11 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
   late String _type = "";
   late int _id =0;
   late int index = 0;
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    final arguments =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    _type = arguments['type'] as String;
-    switch (_type) {
-      case "Reservation":
-        {
-          _dateRamasser = arguments['dateRamasser'] as DateTime;
-          _dateRevenir = arguments['dateRevenir'] as DateTime;
-          _location_de_rammaser = arguments['location_de_rammaser'] as String;
-          _location_de_revenir = arguments['location_de_revenir'] as String;
-          _days = arguments['days'] as int;
-          _numeroSeries = arguments['numeroSeries'] as String;
-          _prixJour = arguments['prixJour'] as double;
-          _caution = arguments['caution'] as double;
-          _prixToutal = arguments['prixToutal'] as double;
-          _modele = arguments['modele'] as String;
-          _photo = arguments['photo'] as String;
-          _PLEIN_SSENCE = arguments['PLEIN ESSENCE'] as bool;
-          _DEUXIEME_CONDUCTEUR = arguments['DEUXIÈME CONDUCTEUR'] as bool;
-          _REHAUSSEUR = arguments['REHAUSSEUR ( 24-42 MOIS)'] as bool;
-          _SYSTEME_DE_NAVIGATION_GPS =
-              arguments['SYSTÈME DE NAVIGATION GPS'] as bool;
-          _SIEGE_BEBE = arguments['SIÈGE BÉBÉ ( 6-24 MOIS)'] as bool;
-        }
-        break;
-    }
+  String getImageNameFromPath(String path) {
+    List<String> pathParts = path.split('/');
+    return pathParts.last;
   }
+  // ignore: override_on_non_overriding_member
 
   void Login1() {
     Navigator.pushNamed(context, 'login', arguments: {
@@ -97,15 +74,22 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
   }
 
   Future<void> insertClient() async {
+    showDialog(
+        context: context,
+        builder: (context){
+          return Center(child:CircularProgressIndicator());
+        }
+    );
     String apiUrl = '$ip/polls/ContinueInscriClient';
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-    request.fields['id'] = _id as String;
+    request.fields['id'] = _id.toString();
     request.fields['numeroparmis'] = _Numero_de_Permis.text;
     request.fields['nomentrprise'] = _Nom_Entreprise.text;
     request.files.add(
         await http.MultipartFile.fromPath('photo_parmis', Image_Parmis_Path));
     var response = await request.send();
     if (response.statusCode == 200) {
+      Navigator.of(context).pop();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
       final String reponse = jsonData['Reponse'];
@@ -148,6 +132,7 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
         });
       }
     } else {
+      Navigator.of(context).pop();
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
           toastLength: Toast.LENGTH_SHORT,
@@ -239,6 +224,27 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
 
   @override
   Widget build(BuildContext context) {
+    final arguments =
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _type = arguments['type'] as String;
+          _dateRamasser = arguments['dateRamasser'] as DateTime;
+          _dateRevenir = arguments['dateRevenir'] as DateTime;
+          _location_de_rammaser = arguments['location_de_rammaser'] as String;
+          _location_de_revenir = arguments['location_de_revenir'] as String;
+          _days = arguments['days'] as int;
+          _numeroSeries = arguments['numeroSeries'] as String;
+          _prixJour = arguments['prixJour'] as double;
+          _caution = arguments['caution'] as double;
+          _prixToutal = arguments['prixToutal'] as double;
+          _modele = arguments['modele'] as String;
+          _photo = arguments['photo'] as String;
+          _PLEIN_SSENCE = arguments['PLEIN ESSENCE'] as bool;
+          _DEUXIEME_CONDUCTEUR = arguments['DEUXIÈME CONDUCTEUR'] as bool;
+          _REHAUSSEUR = arguments['REHAUSSEUR ( 24-42 MOIS)'] as bool;
+          _SYSTEME_DE_NAVIGATION_GPS =
+          arguments['SYSTÈME DE NAVIGATION GPS'] as bool;
+          _SIEGE_BEBE = arguments['SIÈGE BÉBÉ ( 6-24 MOIS)'] as bool;
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -310,11 +316,10 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                  Card(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    elevation: 3, // Add elevation for a shadow effect
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: InkWell(
@@ -322,27 +327,34 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
                         Image_Parmis_Path = await Gallery_Parmis();
                         setState(() {});
                       },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image_Parmis_Path!=""?
+                            Expanded(
+                              child: Text(
+                                "Image ${getImageNameFromPath(Image_Parmis_Path)}",
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ):
+                            Text(
                               translation(context).inscriotion_photoParmi,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.camera_alt),
-                            onPressed: () async {
-                              Image_Parmis_Path = await Camera_Parmis();
-                              setState(() {});
-                            },
-                          ),
-                        ],
+                            IconButton(
+                              icon: Icon(Icons.camera_alt),
+                              onPressed: () async {
+                                Image_Parmis_Path = await Camera_Parmis();
+                                setState(() {});
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

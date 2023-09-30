@@ -32,9 +32,11 @@ class _HistoriqueState extends State<Historique> {
     final prefs = await SharedPreferences.getInstance();
     final response = await http.post(
       Uri.parse('$ip/polls/Afficher_demande_Client'),
-      body: {
-        'id': id,
-      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'id': id,
+        },
+      ),
     );
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
@@ -56,9 +58,12 @@ class _HistoriqueState extends State<Historique> {
 
   late int _selectedIndex = 0;
   Future<void> _loadId() async {
+    print("hello");
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('id')) {
-      id = prefs.getInt('id')!;
+      setState(() {
+        id = prefs.getInt('id')!;
+      });
       _fetchDemande(id);
     } else {
       Navigator.pushNamed(context, 'login');
@@ -354,11 +359,18 @@ class _HistoriqueState extends State<Historique> {
                                                                   )),
                                                               SizedBox(
                                                                   height: 10),
-                                                              Text(AppLocalizations
-                                                                      .of(context)!
-                                                                  .historique_Addressarriver),
-                                                              Text(demande
-                                                                  .address_fin),
+                                                             demande.type=="Transfer" ?
+                                                                 Column(
+                                                                   children: [
+                                                                     Text(AppLocalizations
+                                                                         .of(context)!
+                                                                         .historique_Addressarriver),
+                                                                     Text(demande
+                                                                         .address_fin)
+                                                                   ],
+                                                                 )
+                                                             :
+                                                              Text(''),
                                                             ],
                                                           ),
                                                     SizedBox(height: 10),

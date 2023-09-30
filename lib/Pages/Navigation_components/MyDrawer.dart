@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, unnecessary_null_comparison, use_key_in_widget_constructors, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_constructors, use_build_context_synchronously
+// ignore_for_file: deprecated_member_use, unnecessary_null_comparison, use_key_in_widget_constructors, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_constructors, use_build_context_synchronously, unnecessary_brace_in_string_interps
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -27,8 +27,8 @@ class _MyDrawerState extends State<MyDrawer> {
   late bool _session = false;
   var whatsappUrl = "whatsapp://send?phone=${"+21698307590"}";
   final Uri phoneNumber = Uri.parse('tel:+21698307590');
-  final Uri instagram = Uri.parse('instagram://user?username=neapolis_cars');
-  final Uri TikTok = Uri.parse('tiktok://user?username=@neapolis.car');
+  final String instagram = 'https://www.instagram.com/neapolis_cars/?igshid=MzRlODBiNWFlZA==';
+  final String TikTok = 'https://www.tiktok.com/@neapolis.car';
   Future<void> _loadId() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('id')) {
@@ -313,9 +313,13 @@ class _MyDrawerState extends State<MyDrawer> {
                       size: 30,
                     ),
                     label: Text(''),
-                    onPressed: () {
-                      launchUrl(TikTok);
-                    },
+                      onPressed: ()async {
+                        if (await canLaunch(TikTok)) {
+                          await launch(TikTok);
+                        } else {
+                          throw 'Could not launch ${TikTok}';
+                        }
+                      },
                   ),
                   Text(translation(context).tikTok),
                 ],
@@ -332,9 +336,13 @@ class _MyDrawerState extends State<MyDrawer> {
                       size: 30,
                     ),
                     label: Text(''),
-                    onPressed: () {
-                      launchUrl(instagram);
-                    },
+                      onPressed: ()async {
+                        if (await canLaunch(instagram)) {
+                          await launch(instagram);
+                        } else {
+                          throw 'Could not launch ${instagram}';
+                        }
+                      }
                   ),
                   Text(translation(context).instagram),
                 ],

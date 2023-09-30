@@ -118,7 +118,7 @@ class NavBarState extends State<NavBar> {
           label: translation(context).accueil,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.car_crash),
+          icon: Icon(Icons.local_offer),
           label: translation(context).post_title,
         ),
         BottomNavigationBarItem(
