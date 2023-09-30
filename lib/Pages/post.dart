@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:neapolis_car/Pages/Classes/post.dart';
@@ -8,6 +9,7 @@ import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 
 import 'package:neapolis_car/main.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ListPost extends StatefulWidget {
   const ListPost({Key? key}) : super(key: key);
@@ -57,6 +59,7 @@ class _ListPostState extends State<ListPost> {
       endDrawer: MyDrawer(selectedIndex: _selectedIndex),
       body: _Posts != null
           ? ListView(
+        padding: EdgeInsets.all(16),
               children: _Posts.map((post) => Card(
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,6 +86,27 @@ class _ListPostState extends State<ListPost> {
                           ),
                           Text(translation(context).post_date_fin +
                               post.date_fin.toString()),
+                          Column(
+                            children: [
+                              TextButton.icon(
+                                icon: FaIcon(
+                                  FontAwesomeIcons.tiktok,
+                                  color: Colors.black,
+                                  size: 15,
+                                ),
+                                label: Text(''),
+                                onPressed: ()async {
+                                  if (await canLaunch(post.lien)) {
+                                    await launch(post.lien);
+                                  } else {
+                                    throw 'Could not launch ${post.lien}';
+                                  }
+                                }
+                              ),
+                              Text(translation(context).tikTok,
+                              style: TextStyle(fontSize: 12),),
+                            ],
+                          ),
                         ],
                       ),
                     ],

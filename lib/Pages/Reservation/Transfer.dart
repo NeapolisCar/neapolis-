@@ -1,15 +1,19 @@
 // ignore_for_file: non_constant_identifier_names, no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:neapolis_car/Pages/Classes/Gallery.dart';
 import 'package:neapolis_car/Pages/Classes/ListExurcion.dart';
 import 'package:neapolis_car/Pages/Classes/ListTransfer.dart';
 import 'package:neapolis_car/Pages/Compounes/datepicker.dart';
 import 'package:neapolis_car/Pages/Compounes/dropitem.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 import 'package:neapolis_car/main.dart';
+import 'package:translator/translator.dart';
+import 'package:intl/intl.dart';
 
 class Transfer extends StatefulWidget {
   const Transfer({Key? key}) : super(key: key);
@@ -21,12 +25,13 @@ class Transfer extends StatefulWidget {
 class _TransferState extends State<Transfer> {
   bool value1 = false;
   bool value2 = false;
-  bool _Transfer = false;
+  bool _Transfer = true;
   TextEditingController _date_ramasser = TextEditingController();
   String dropdownvalue3 = "";
   String dropdownvalue4 = "";
   String dropdownvalue5 = "";
   ListExurcion? _Exurcion;
+  final translator = GoogleTranslator();
   List<Map<String, dynamic>>? jsonDataList;
   int? idlisttransfer;
   int? idlistexurion;
@@ -34,6 +39,8 @@ class _TransferState extends State<Transfer> {
   List<ListExurcion> _ListExurcion=[];
   List<String> _items3 = [];
   List<String> _items4 = [];
+  List<Gallery> gallery =[];
+  List<String> images =[];
   final List<String> _items5 = ["transfer", "exurcion"];
   void InsertList(){
     String Addres="";
@@ -47,6 +54,7 @@ class _TransferState extends State<Transfer> {
       }
     }
   }
+
   Future<void> fatcheLisTransfer()async{
     final response = await http.post(Uri.parse("$ip/polls/AfficherListTransfer"));
     if (response.statusCode == 200) {
@@ -94,6 +102,51 @@ class _TransferState extends State<Transfer> {
           fontSize: 16.0);
       throw Exception('Failed to load data from the API');
     }
+  }
+  Future<void> fatchGallery()async{
+    final response = await http.post(Uri.parse("$ip/polls/Afficher_Gallery"));
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      setState(() {
+        final gallers = jsonData.map((json) {
+          return Gallery.fromJson(json);
+        }).cast<Gallery>().toList();
+        setState(() {
+          gallery= gallers;
+        });
+        setState(() {
+          images = gallery
+              .where((galleryItem) => galleryItem.listExurcion == gallery.first.listExurcion)
+              .map((galleryItem) => galleryItem.photo)
+              .toList();
+        });
+      });
+
+    } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
+    }
+  }
+  void changeimage(int id){
+    setState(() {
+      images = gallery
+          .where((galleryItem) => galleryItem.listExurcion == id)
+          .map((galleryItem) => galleryItem.photo)
+          .toList();
+    });
+  }
+  Widget buildImage(String urlImage, int index) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5),
+      child: Image.network(urlImage, fit: BoxFit.cover),
+    );
   }
   bool isDateTodayOrFuture(DateTime date) {
     final now = DateTime.now();
@@ -213,6 +266,7 @@ class _TransferState extends State<Transfer> {
     super.initState();
     fatcheLisTransfer();
     fatchListExurcion();
+    fatchGallery();
   }
   @override
   Widget build(BuildContext context) {
@@ -320,37 +374,51 @@ class _TransferState extends State<Transfer> {
         ),
         Visibility(
           visible: !_Transfer,
-          child: Card(
-            margin: const EdgeInsets.all(16),
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            ),
-            child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: DropdownButton<ListExurcion>(
-            hint: Text(translation(context).reservation_Transfer_address1),
-            value: _Exurcion,
-            onChanged: (newValue) {
-              setState(() {
-                _Exurcion= newValue;
-              });
-            },
-            items: _ListExurcion.map<DropdownMenuItem<ListExurcion>>((ListExurcion value) {
-              return DropdownMenuItem(
-                value: value,
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_pin),
-                    Text(value.addressDepart),
-                  ],
+          child:Column(
+            children: [
+              Card(
+                margin: const EdgeInsets.all(16),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              );
-            }).toList(),
-            isExpanded: true,
-          ),
-            ),
-          ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: DropdownButton<ListExurcion>(
+                    hint: Text(translation(context).reservation_Transfer_address1),
+                    value: _Exurcion,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _Exurcion= newValue;
+                      });
+                      changeimage(newValue!.id);
+                    },
+                    items: _ListExurcion.map<DropdownMenuItem<ListExurcion>>((ListExurcion value) {
+                      return DropdownMenuItem(
+                        value: value,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.location_pin),
+                            Text(value.addressDepart),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    isExpanded: true,
+                  ),
+                ),
+              ),
+              CarouselSlider.builder(
+                  itemCount: images.length,
+                  itemBuilder: (context,index,realIndex){
+                    final urlImage = images[index];
+                    return buildImage(urlImage,index);
+                  },
+                  options: CarouselOptions(height: 400)
+              )
+            ],
+          )
+
         ),
         datepicker(
           date: _date_ramasser,

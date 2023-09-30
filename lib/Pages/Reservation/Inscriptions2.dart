@@ -296,13 +296,18 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
     });
     return image.path;
     }
-
   Gallery() async {
     image = ((await ImagePicker().pickImage(source: ImageSource.gallery)) as XFile?)!;
     return image.path;
     }
 
   Future<void> insertClient() async {
+    showDialog(
+        context: context,
+        builder: (context){
+          return Center(child:CircularProgressIndicator());
+        }
+    );
     String apiUrl = '$ip/polls/InserClientTranfer';
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
     request.fields['nomprenom'] = _nomprenom.text;
@@ -324,6 +329,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
     }
     var response = await request.send();
     if (response.statusCode == 200) {
+      Navigator.of(context).pop();
       final prefs = await SharedPreferences.getInstance();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
@@ -393,6 +399,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
         }
       }
     } else {
+      Navigator.of(context).pop();
       Fluttertoast.showToast(
           msg: "error",
           toastLength: Toast.LENGTH_SHORT,
@@ -691,14 +698,18 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 16),
+                    _Image_Cin_passpor_Path!=""?
+                    Expanded(
                       child: Text(
-                        translation(context).inscriotion_photoCIN_PASSPORT,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        "Image ${getImageNameFromPath(_Image_Cin_passpor_Path)}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ):
+                    Text(
+                      translation(context).inscriotion_photoCIN_PASSPORT,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(

@@ -23,32 +23,34 @@ class Piament extends StatefulWidget {
 }
 
 class _PiamentState extends State<Piament> {
-  late bool _DEUXIEME_CONDUCTEUR = false;
-  late bool _REHAUSSEUR = false;
-  late bool _SYSTEME_DE_NAVIGATION_GPS = false;
-  late bool _SIEGE_BEBE = false;
-  late bool _PLEIN_SSENCE = false;
-  late DateTime? _dateRamasser;
-  late DateTime? _dateRevenir;
-  late String? _location_de_rammaser;
-  late String? _location_de_revenir;
-  late int _days = 1;
-  late String _numeroSeries = "";
-  late double _prixToutal = 0;
-  late double _prixJour = 0;
-  late String _modele = "";
-  late String _photo = "";
-  late String _type = "";
-  late bool _allez_retour = false;
-  late double _prixtoul = 0;
-  late bool _siege_bebe = false;
-  late String _nb_place = "";
-  late String _nb_bagage = "";
-  late List<Client> _Client = [];
-  late int id = 0;
-  late String _nomprenom = 'Visture';
-  late int? _idlisttransfer;
-  late int? _idlistexurion;
+  bool _DEUXIEME_CONDUCTEUR = false;
+  bool _REHAUSSEUR = false;
+  bool _SYSTEME_DE_NAVIGATION_GPS = false;
+  bool _SIEGE_BEBE = false;
+  bool _PLEIN_SSENCE = false;
+  DateTime? _dateRamasser;
+  DateTime? _dateRevenir;
+  String? _location_de_rammaser;
+  String? _location_de_revenir;
+  int _days = 1;
+  double _prix = 0;
+  String _numeroSeries = "";
+  double _prixToutal = 0;
+  double _prixJour = 0;
+  String _modele = "";
+  String _photo = "";
+  String _type = "";
+  bool _allez_retour = false;
+  double _prixtoul = 0;
+  bool _siege_bebe = false;
+  String _nb_place = "";
+  String _nb_bagage = "";
+  List<Client> _Client = [];
+  int id = 0;
+  String _nomprenom = 'Visture';
+  int? _idlisttransfer;
+  int? _idlistexurion;
+  double _caution = 0;
   var whatsappUrl = "whatsapp://send?phone=${"+21698307590"}";
   final Uri phoneNumber = Uri.parse('tel:+21698307590');
   Future<void> getClient() async {
@@ -116,6 +118,8 @@ class _PiamentState extends State<Piament> {
               'location_de_rammaser': _location_de_rammaser,
               'location_de_revenir': _location_de_revenir,
               'days': _days,
+              'caution': _caution,
+              'prix':_prix,
               'numeroSeries': _numeroSeries,
               'prixToutal': _prixToutal,
               'modele': _modele,
@@ -183,7 +187,7 @@ class _PiamentState extends State<Piament> {
 
   Future<void> Paiement_cash(int id_demande) async {
     final prefs = await SharedPreferences.getInstance();
-    final id = prefs.getString('id')!;
+    final id = prefs.getInt('id')!;
     final response = await http.post(
       Uri.parse('$ip/polls/InsertPiaemnt'),
       headers: <String, String>{
@@ -404,6 +408,7 @@ class _PiamentState extends State<Piament> {
     switch (_type) {
       case "Reservation":
         {
+          _type = arguments['type'] as String;
           _dateRamasser = arguments['dateRamasser'] as DateTime;
           _dateRevenir = arguments['dateRevenir'] as DateTime;
           _location_de_rammaser = arguments['location_de_rammaser'] as String;
@@ -411,14 +416,15 @@ class _PiamentState extends State<Piament> {
           _days = arguments['days'] as int;
           _numeroSeries = arguments['numeroSeries'] as String;
           _prixJour = arguments['prixJour'] as double;
+          _caution = arguments['caution'] as double;
           _prixToutal = arguments['prixToutal'] as double;
+          _prix = arguments['prix'] as double;
           _modele = arguments['modele'] as String;
           _photo = arguments['photo'] as String;
           _PLEIN_SSENCE = arguments['PLEIN ESSENCE'] as bool;
           _DEUXIEME_CONDUCTEUR = arguments['DEUXIÈME CONDUCTEUR'] as bool;
           _REHAUSSEUR = arguments['REHAUSSEUR ( 24-42 MOIS)'] as bool;
-          _SYSTEME_DE_NAVIGATION_GPS =
-          arguments['SYSTÈME DE NAVIGATION GPS'] as bool;
+          _SYSTEME_DE_NAVIGATION_GPS = arguments['SYSTÈME DE NAVIGATION GPS'] as bool;
           _SIEGE_BEBE = arguments['SIÈGE BÉBÉ ( 6-24 MOIS)'] as bool;
         }
         break;
@@ -590,7 +596,7 @@ class _PiamentState extends State<Piament> {
               SizedBox(height: 20.0),
               InkWell(
                 onTap: () {
-                  Paiment();
+                  Dialog();
                 },
                 child: Container(
                   height: 150.0,

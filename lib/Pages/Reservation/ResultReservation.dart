@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, non_constant_identifier_names, prefer_const_constructors, no_leading_underscores_for_local_identifiers, prefer_interpolation_to_compose_strings, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'dart:async';
@@ -22,26 +23,26 @@ class ResultResrvation extends StatefulWidget {
 }
 
 class _ResultResrvationState extends State<ResultResrvation> {
-  late bool _DEUXIEME_CONDUCTEUR = false;
-  late bool _REHAUSSEUR = false;
-  late bool _SYSTEME_DE_NAVIGATION_GPS = false;
-  late bool _SIEGE_BEBE = false;
-  late bool _PLEIN_SSENCE = false;
-  late DateTime? _dateRamasser;
-  late DateTime? _dateRevenir;
-  late String? _location_de_rammaser;
-  late String? _location_de_revenir;
-  late int _days = 1;
-  late String _numeroSeries = "";
-  late double _prixToutal = 0;
-  late double _prixJour = 0;
-  late double _prix = 0;
-  late double _caution = 0;
-  late String _modele = "";
-  late String _photo = "";
-  late String _type = "";
-  late List<Client> _Client = [];
-  late int id = 0;
+  bool _DEUXIEME_CONDUCTEUR = false;
+  bool _REHAUSSEUR = false;
+  bool _SYSTEME_DE_NAVIGATION_GPS = false;
+  bool _SIEGE_BEBE = false;
+  bool _PLEIN_SSENCE = false;
+  DateTime? _dateRamasser;
+  DateTime? _dateRevenir;
+  String? _location_de_rammaser;
+  String? _location_de_revenir;
+  int _days = 1;
+  String _numeroSeries = "";
+  double _prixToutal = 0;
+  double _prixJour = 0;
+  double _prix = 0;
+  double _caution = 0;
+  String _modele = "";
+  String _photo = "";
+  String _type = "";
+  List<Client> _Client = [];
+  int id = 0;
   final int _selectedIndex = 0;
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
@@ -82,6 +83,8 @@ class _ResultResrvationState extends State<ResultResrvation> {
       'prixToutal': _prixToutal,
       'modele': _modele,
       'prixJour': _prixJour,
+      'caution': _caution,
+      'prix':_prix,
       'photo': _photo,
       'PLEIN ESSENCE': _PLEIN_SSENCE,
       'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
@@ -128,26 +131,30 @@ class _ResultResrvationState extends State<ResultResrvation> {
                     Text(
                       translation(context)
                               .result_reservation_regel_paraghraph4 +
-                          _caution.toString() +
-                          translation(context)
-                              .result_reservation_regel_paraghraph4_1,
+                          _caution.toString() ,
                       style: Theme.of(context)
                           .textTheme
                           .caption!
                           .apply(fontWeightDelta: 5, color: Colors.red),
                     ),
-                    Text(
-                      translation(context).result_reservation_regel_paraghraph5,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+                    Text( translation(context)
+                        .result_reservation_regel_paraghraph4_1,
+                        style: Theme.of(context)
+                            .textTheme
+                            .caption!
+                            .apply(fontWeightDelta: 5)
                     ),
                     Text(
-                      translation(context).result_reservation_regel_paraghraph6,
+                      translation(context).result_reservation_regel_paraghraph5,
                       style: Theme.of(context)
                           .textTheme
                           .caption!
-                          .apply(fontWeightDelta: 5),
+                          .apply(fontWeightDelta: 5
+                    ),
+                    ),
+                    Text(
+                      translation(context).result_reservation_regel_paraghraph6,
+                        style: Theme.of(context).textTheme.headline6
                     ),
                     Text(
                         translation(context)
@@ -226,7 +233,11 @@ class _ResultResrvationState extends State<ResultResrvation> {
                     ),
                     SizedBox(height: 10),
                     CheckboxListTile(
-                      title: Text(translation(context).details_voiture_RA),
+                      title: Text(translation(context).details_voiture_RA,
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption!
+                              .apply(fontWeightDelta: 5)),
                       value: _acceptRole,
                       onChanged: (newValue) {
                         setState(() {
@@ -242,7 +253,8 @@ class _ResultResrvationState extends State<ResultResrvation> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text(translation(context).details_voiture_RAn),
+                  child: Text(translation(context).details_voiture_RAn,
+                      style:Theme.of(context).textTheme.button),
                 ),
                 SizedBox(width: 20),
                 ElevatedButton(
@@ -251,7 +263,10 @@ class _ResultResrvationState extends State<ResultResrvation> {
                           Conferme();
                         }
                       : null,
-                  child: Text(translation(context).details_voiture_Rbutton),
+                  child: Text(translation(context).details_voiture_Rbutton,
+                      style:Theme.of(context).textTheme.button!
+                  ),
+                  style: Theme.of(context).elevatedButtonTheme.style,
                 ),
               ],
             );

@@ -40,6 +40,13 @@ class _LoginState extends State<Login> {
   bool value1 = false;
 
   void Logins(String email, String mot_de_passe, BuildContext context) async {
+    showDialog(
+        context: context,
+        builder: (context){
+          return Center(child:CircularProgressIndicator());
+        }
+    );
+
     final response = await http.post(
       Uri.parse('$ip/polls/Verification'),
       headers: <String, String>{
@@ -51,6 +58,7 @@ class _LoginState extends State<Login> {
       }),
     );
     if (response.statusCode == 200) {
+      Navigator.of(context).pop();
       final prefs = await SharedPreferences.getInstance();
       final responseData = jsonDecode(response.body);
       if (responseData.containsKey('Reponse')) {

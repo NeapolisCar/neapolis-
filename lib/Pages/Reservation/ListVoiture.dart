@@ -31,7 +31,7 @@ class _ListVoitureState extends State<ListVoiture> {
   final List<String> _items = [
     "prix_decroissant",
     "prix_croissant",
-    "plus_de_demande",
+    "Marque",
   ];
   final _selectedIndex = 0;
   DateTime _dateRamasser = DateTime.now();
@@ -206,7 +206,7 @@ class _ListVoitureState extends State<ListVoiture> {
           });
       } else {
       Fluttertoast.showToast(
-        msg: translation(context).inscriotion_message12,
+        msg: translation(context).inscriotion_message11,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 1,
@@ -214,11 +214,10 @@ class _ListVoitureState extends State<ListVoiture> {
         textColor: Colors.white,
         fontSize: 16.0);
         }
-
     } else {
       Fluttertoast.showToast(
           // ignore: use_build_context_synchronously
-          msg: translation(context).inscriotion_message12,
+          msg: translation(context).inscriotion_message11,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,

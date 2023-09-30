@@ -1,7 +1,7 @@
 import 'package:neapolis_car/main.dart';
 
 class Post {
-  final String id;
+  final int id;
   final String type;
   final String descriptions;
   final String date_depart;
@@ -24,7 +24,7 @@ class Post {
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       id: json['id'],
-      type: json['type'],
+      type: json['title'],
       descriptions: json['descriptions'],
       date_depart: json['date_depart'],
       date_fin: json['date_fin'],

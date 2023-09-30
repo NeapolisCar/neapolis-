@@ -14,6 +14,7 @@ import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:neapolis_car/main.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class Inscription extends StatefulWidget {
   const Inscription({Key? key}) : super(key: key);
@@ -499,6 +500,12 @@ onStepTapped(int value){
     currentStep= value;
 }
   Future<void> insertClient() async {
+    showDialog(
+        context: context,
+        builder: (context){
+          return Center(child:CircularProgressIndicator());
+        }
+    );
     String apiUrl = '$ip/polls/InserClient';
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
     request.fields['nomprenom'] = _nomprenom.text;
@@ -524,7 +531,7 @@ onStepTapped(int value){
     }
     var response = await request.send();
     if (response.statusCode == 200) {
-      final prefs = await SharedPreferences.getInstance();
+      Navigator.of(context).pop();      final prefs = await SharedPreferences.getInstance();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
       final String reponse = jsonData['Reponse'].toString();
@@ -585,6 +592,7 @@ onStepTapped(int value){
         }
       }
     } else {
+      Navigator.of(context).pop();
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message10,
           toastLength: Toast.LENGTH_SHORT,

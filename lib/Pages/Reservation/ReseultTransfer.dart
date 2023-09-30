@@ -1,10 +1,16 @@
-// ignore_for_file: deprecated_member_use, non_constant_identifier_names, prefer_final_fields, no_leading_underscores_for_local_identifiers, prefer_const_constructors, sized_box_for_whitespace
+// ignore_for_file: deprecated_member_use, non_constant_identifier_names, prefer_final_fields, no_leading_underscores_for_local_identifiers, prefer_const_constructors, sized_box_for_whitespace, prefer_interpolation_to_compose_strings
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:neapolis_car/Pages/Classes/ListExurcion.dart';
+import 'package:neapolis_car/Pages/Classes/ListTransfer.dart';
 import 'package:neapolis_car/Pages/Navigation_components/MyDrawer.dart';
 import 'package:neapolis_car/Pages/Navigation_components/NavBar.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
+
+import '../../main.dart';
 
 class ResultaTransfer extends StatefulWidget {
   const ResultaTransfer({Key? key}) : super(key: key);
@@ -25,9 +31,61 @@ class _ResultaTransferState extends State<ResultaTransfer> {
   String _nb_place = "";
   String _nb_bagage = "";
   int id = 0;
+  List<LisTransfer> _ListTransfer=[];
+  List<ListExurcion> _ListExurcion=[];
   int? _idlisttransfer;
   int? _idlistexurion;
+  String _address_depar="";
+  String _address_fin="";
   int _selectedIndex = 0;
+  void getData() async{
+    while (_type=="") {
+      await Future.delayed(const Duration(seconds: 1));
+    }
+    fetchDetails();
+  }
+  Future<void> fetchDetails() async {
+    if (_type == "Transfer") {
+      final response = await http.post(
+          Uri.parse("$ip/polls/AfficherListTransfer1"));
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+        setState(() {
+          _ListTransfer = jsonData.map((json) {
+            return LisTransfer.fromJson(json);
+          }).toList();
+        });
+        setState(() {
+          _address_depar= _ListTransfer.first.addressDepart;
+          _address_fin= _ListTransfer.first.addressFin;
+        });
+      }
+    }
+    else if (_type == "Exurcion") {
+      final response = await http.post(
+        Uri.parse("$ip/polls/AfficherListExurcion1"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(
+            <String, dynamic>{'id': _idlistexurion}), // Send data as JSON
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+        setState(() {
+          final listExurcion = jsonData.map((json) {
+            return ListExurcion.fromJson(json);
+          }).cast<ListExurcion>().toList();
+          setState(() {
+            _ListExurcion = listExurcion;
+          });
+          setState(() {
+            _address_depar= _ListExurcion.first.addressDepart;
+          });
+        });
+      }
+    }
+  }
   void Dialog() {
     bool _acceptRole = false;
     showDialog(
@@ -175,8 +233,8 @@ class _ResultaTransferState extends State<ResultaTransfer> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    getData();
   }
 
   @override
@@ -258,7 +316,7 @@ class _ResultaTransferState extends State<ResultaTransfer> {
             child: MyAppBar(Title: translation(context).result_transfer_title),
           ),
           endDrawer: MyDrawer(selectedIndex: _selectedIndex),
-          body:  Column(
+          body: _ListTransfer!=[] && _ListExurcion!=[]?  Column(
                           children: [
                             Card(
                               margin: EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -333,6 +391,32 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(height: 20,),
+                                    _type=="Transfer"?
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(translation(context).historique_Addressdepar ),
+                                            Text(_address_depar)
+                                          ],
+                                        ),
+                                        SizedBox(height: 10,),
+                                        Row(
+                                          children: [
+                                            Text(translation(context).historique_Addressarriver),
+                                            Text(_address_fin)
+                                          ],
+                                        )
+                                      ],
+                                    ):Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(translation(context).historique_Addressdepar),
+                                        SizedBox(height: 10,),
+                                        Text(_address_depar)
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -350,17 +434,18 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                                 children: [
                                   Expanded(
                                     child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            translation(context)
-                                                .details_voiture_PrixToutal,
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                            ),
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top:10 ,left: 10),
+                                        child: Text(
+                                          translation(context)
+                                              .details_voiture_PrixToutal,
+                                          style: TextStyle(
+                                            fontSize: 10,
                                           ),
-                                        )),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                   Expanded(
                                     child: Align(
@@ -428,7 +513,7 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                               ],
                             )
                           ],
-                ),
+                ):CircularProgressIndicator(),
           bottomNavigationBar: NavBar(
             selectedIndex: _selectedIndex,
           ),
