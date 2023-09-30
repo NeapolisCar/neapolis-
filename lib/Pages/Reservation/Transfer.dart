@@ -25,7 +25,8 @@ class Transfer extends StatefulWidget {
 class _TransferState extends State<Transfer> {
   bool value1 = false;
   bool value2 = false;
-  bool _Transfer = true;
+  bool _Transfer = false;
+  bool _Exurion= false;
   TextEditingController _date_ramasser = TextEditingController();
   String dropdownvalue3 = "";
   String dropdownvalue4 = "";
@@ -283,10 +284,13 @@ class _TransferState extends State<Transfer> {
             if (selectedValue == "transfer") {
               setState(() {
                 _Transfer = true;
+                _Exurion= false;
               });
             } else if (selectedValue == "exurcion") {
               setState(() {
                 _Transfer = false;
+                _Exurcion= _ListExurcion.first;
+                _Exurion=true;
               });
             }
           },
@@ -328,6 +332,7 @@ class _TransferState extends State<Transfer> {
                 )
               ),
               ),
+
                 Card(
                   margin: const EdgeInsets.all(16),
                   elevation: 5,
@@ -370,10 +375,11 @@ class _TransferState extends State<Transfer> {
                     value2 = newBool!;
                   });
                 }),
-          ]),
+          ]
+          ),
         ),
         Visibility(
-          visible: !_Transfer,
+          visible: _Exurion,
           child:Column(
             children: [
               Card(

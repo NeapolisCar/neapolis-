@@ -24,7 +24,6 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  TextEditingController _nomprenom = TextEditingController();
   TextEditingController _email = TextEditingController();
   TextEditingController _mot_de_passe = TextEditingController();
   TextEditingController _nmot_de_passe = TextEditingController();
@@ -37,59 +36,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _image = '';
   int _selectedIndex = 1;
   int _selectedIndex1 = 2;
-  late CameraController _controller;
   String Image_Path = ' ';
-  XFile? image;
   int _id =0;
   String email = '';
-  Camera() async {
-    _controller = CameraController(cameras[0], ResolutionPreset.max);
-    _controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            Fluttertoast.showToast(
-                msg: translation(context).inscriotion_message11,
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.TOP,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
-            break;
-          default:
-            Fluttertoast.showToast(
-                msg: translation(context).inscriotion_message11,
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.TOP,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
-            break;
-        }
-      }
-    });
-    setState(() async {
-      final image =
-      (await ImagePicker().pickImage(source: ImageSource.camera)) as XFile?;
-    });
-    if (image != null) {
-      return image!.path;
-    }
-  }
-  Gallery() async {
-    image =
-    ((await ImagePicker().pickImage(source: ImageSource.gallery)) as XFile?)!;
-    if (image != null) {
-      return image!.path;
-    }
-  }
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
     _id = prefs.getInt('id')!;
@@ -119,7 +68,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       throw Exception('Failed to load notifications');
     }
   }
-  Future<void> _save(String email, String telephone) async {
+  Future<void> _save() async {
+    print(_telephone);
     final prefs = await SharedPreferences.getInstance();
     _id = prefs.getInt('id')!;
     List<Client> client = [];
@@ -128,7 +78,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     request.fields['id']= _id.toString() ;
     request.fields['telephone'] = _telephone;
     request.fields['email'] = _email.text;
-    request.files.add(await http.MultipartFile.fromPath('photo', Image_Path));
     var response = await request.send();
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
@@ -206,72 +155,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           fontSize: 16.0);
     }
   }
-  void Dialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(""),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
-                          children: [
-                            TextButton.icon(
-                              icon: FaIcon(
-                                FontAwesomeIcons.camera,
-                                color: Colors.green,
-                                size: 30,
-                              ),
-                              label: Text(''),
-                              onPressed: ()async {
-                                Image_Path = await Camera();
-                                setState(() {
-                                  _image = Image_Path;
-                                });
-                                Navigator.of(context).pop(false);
-                              },
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            TextButton.icon(
-                              icon: FaIcon(
-                                FontAwesomeIcons.image,
-                                color: Colors.green,
-                                size: 30,
-                              ),
-                              label: Text(''),
-                              onPressed: () async {
-                                Image_Path = await Gallery();
-                                setState(() {
-                                  _image = Image_Path;
-                                });
-                                Navigator.of(context).pop(false);
-                                },
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              actions: [],
-            );
-          },
-        );
-      },
-    );
-  }
   @override
   void initState() {
     super.initState();
@@ -284,7 +167,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _Client = arguments['Client'] as List<Client>;
     if (_Client.isNotEmpty) {
-      _nomprenom.text = _Client.first.nomprenom;
       _email.text = _Client.first.email;
       _telephone = _Client.first.telephone.toString();
       _image = _Client.first.photo;
@@ -332,18 +214,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                top: 100,
-                                // bottom: 0,
-                                right: 0,
-                                left: 120,
-                                child: IconButton(
-                                  icon: Icon(Icons.camera_alt),
-                                  onPressed: ()  {
-                                    Dialog();
-                                  },
-                                ),
-                              ),
                             ],
                           ),
                           Divider(
@@ -374,9 +244,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 Container(
                                     padding: const EdgeInsets.all(8.0),
                                     child: IntlPhoneField(
-                                      initialValue: telephone1,
+                                      initialValue: _telephone,
                                       decoration: InputDecoration(
-                                        labelText:translation(context).inscriotion_telephone,
+                                        labelText: translation(context).inscriotion_telephone,
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(20.0),
                                         ),
@@ -384,13 +254,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       ),
                                       initialCountryCode: selectedCountryCode,
                                       onChanged: (phone) {
+                                        // Update the state of the phone variable
                                         setState(() {
-                                          _telephone= phone.completeNumber;
+                                          _telephone = phone.completeNumber;
                                         });
-                                      },
-                                      onCountryChanged: (phoneCountry) {
-                                        selectedCountryCode = phoneCountry.code;
-                                        // Handle the selected country code change here
                                       },
                                     )
                                 ),
@@ -399,10 +266,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      _save(
-                                        _email.text,
-                                        _telephone
-                                      );
+                                      _save();
                                     },
                                     style: ElevatedButton.styleFrom(
                                       primary: Colors.red[900],

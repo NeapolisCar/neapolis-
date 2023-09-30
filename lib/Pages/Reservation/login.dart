@@ -84,7 +84,8 @@ class _LoginState extends State<Login> {
                 'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
                 'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
               });
-      } else {
+      } else if (responseData.containsKey('resultat'))  {
+
         Fluttertoast.showToast(
             msg: translation(context).login_message1,
             toastLength: Toast.LENGTH_SHORT,

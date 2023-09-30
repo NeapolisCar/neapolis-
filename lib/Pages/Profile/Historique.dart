@@ -58,7 +58,6 @@ class _HistoriqueState extends State<Historique> {
 
   late int _selectedIndex = 0;
   Future<void> _loadId() async {
-    print("hello");
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('id')) {
       setState(() {
@@ -172,7 +171,7 @@ class _HistoriqueState extends State<Historique> {
           return Demande.fromJson(json);
         }).toList();
       });
-      _fetchDemande(id);
+      Navigator.pushNamed(context, 'Historique');
     } else {
       throw Exception('Failed to load voitures');
     }
@@ -250,8 +249,12 @@ class _HistoriqueState extends State<Historique> {
                                             child: Row(
                                               children: [
                                                 Column(children: [
+                                                  demande.photo!=""?
                                                   Image.network(
                                                     demande.photo,
+                                                    width: 152,
+                                                    height: 99,
+                                                  ):Image.asset("assets/images/default_image.jpg",
                                                     width: 152,
                                                     height: 99,
                                                   ),
@@ -331,8 +334,8 @@ class _HistoriqueState extends State<Historique> {
                                                                       .of(context)!
                                                                   .historique_fin),
                                                               Text(
-                                                                  demande
-                                                                      .date_de_revinier,
+                                                                  DateTime.parse(demande
+                                                                      .date_de_revinier).toString(),
                                                                   style:
                                                                       TextStyle(
                                                                     fontSize:
@@ -362,6 +365,7 @@ class _HistoriqueState extends State<Historique> {
                                                                   height: 10),
                                                              demande.type=="Transfer" ?
                                                                  Column(
+                                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                                    children: [
                                                                      Text(AppLocalizations
                                                                          .of(context)!

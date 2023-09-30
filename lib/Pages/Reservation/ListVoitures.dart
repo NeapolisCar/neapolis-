@@ -34,7 +34,6 @@ class _ListVoituresState extends State<ListVoitures> {
   final List<String> _items = [
     "prix_decroissant",
     "prix_croissant",
-    "plus_de_demande",
   ];
   int _selectedIndex = 0;
   DateTime _dateRamasser = DateTime.now();
@@ -111,6 +110,9 @@ class _ListVoituresState extends State<ListVoitures> {
                   },
                   child: Text(translation(context).details_voiture_RAn,
                       style:Theme.of(context).textTheme.button),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red[900],
+                  ),
                 ),
                 SizedBox(width: 20),
                 ElevatedButton(
@@ -120,6 +122,9 @@ class _ListVoituresState extends State<ListVoitures> {
                   } : null,
                   child: Text(translation(context).details_voiture_Rbutton,
                       style:Theme.of(context).textTheme.button),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green[900],
+                  ),
                 ),
               ],
             );
@@ -461,11 +466,15 @@ class _ListVoituresState extends State<ListVoitures> {
                                   children: [
                                     Column(
                                         children: [
+                                          voiture.photo!=""?
                                       Image.network(
                                         voiture.photo,
                                         width: 152,
                                         height: 99,
-                                      ),
+                                      ):Image.asset("assets/images/default_image.jpg",
+                                            width: 152,
+                                            height: 99,
+                                          ),
                                       SizedBox(height: 50),
                                       Text(
                                         voiture.modele == "mercidies"

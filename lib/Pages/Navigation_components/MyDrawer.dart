@@ -145,7 +145,7 @@ class _MyDrawerState extends State<MyDrawer> {
               decoration: BoxDecoration(color: Colors.red),
               child: Column(
                 children: [
-                  _image != null
+                  _image != ""
                       ? Center(
                           child: CircleAvatar(
                             backgroundColor: Colors
@@ -166,7 +166,7 @@ class _MyDrawerState extends State<MyDrawer> {
                         )
                       : CircleAvatar(
                           backgroundImage: AssetImage(
-                            'assets/images/user.jpg',
+                            'assets/images/user.png',
                           ),
                           radius: 50,
                         ),

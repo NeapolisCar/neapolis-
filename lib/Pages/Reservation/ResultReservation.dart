@@ -253,6 +253,9 @@ class _ResultResrvationState extends State<ResultResrvation> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red[900],
+                  ),
                   child: Text(translation(context).details_voiture_RAn,
                       style:Theme.of(context).textTheme.button),
                 ),
@@ -357,8 +360,12 @@ class _ResultResrvationState extends State<ResultResrvation> {
                                     ),
                                   ),
                                 ),
-                                Image.network(
+                                _photo!=""?Image.network(
                                   _photo,
+                                  width: 289,
+                                  height: 133,
+                                ):
+                                Image.asset("assets/images/default_image.jpg",
                                   width: 289,
                                   height: 133,
                                 ),

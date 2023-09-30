@@ -174,6 +174,9 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red[900],
+                  ),
                   child: Text(translation(context).details_voiture_RAn),
                 ),
                 SizedBox(width: 20),
@@ -184,6 +187,9 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                         }
                       : null, // Désactiver le bouton Accepter si la case à cocher n'est pas cochée
                   child: Text(translation(context).details_voiture_Rbutton),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green[900],
+                  ),
                 ),
               ],
             );
@@ -341,8 +347,12 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                                         ),
                                       ),
                                     ),
-                                    Image.network(
+                                    _photo!=""?Image.network(
                                       _photo,
+                                      width: 289,
+                                      height: 133,
+                                    ):
+                                    Image.asset("assets/images/default_image.jpg",
                                       width: 289,
                                       height: 133,
                                     ),
