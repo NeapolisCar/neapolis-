@@ -360,14 +360,12 @@ class _ResultResrvationState extends State<ResultResrvation> {
                                     ),
                                   ),
                                 ),
-                                _photo!=""?Image.network(
+                                Image.network(
                                   _photo,
                                   width: 289,
                                   height: 133,
-                                ):
-                                Image.asset("assets/images/default_image.jpg",
-                                  width: 289,
-                                  height: 133,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 20,

@@ -30,7 +30,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController _cmot_de_passe = TextEditingController();
   bool telephone = false;
   String _telephone = "";
-  String telephone1="";
+  String _telephone1="";
   String selectedCountryCode = 'TN';
   List<Client> _Client = [];
   String _image = '';
@@ -61,7 +61,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         if (_Client.isNotEmpty) {
           email = _Client.first.email;
           _image = _Client.first.photo;
-          telephone1=_Client.first.telephone;
+          _telephone=_Client.first.telephone;
         }
       });
     } else {
@@ -76,7 +76,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String apiUrl = '$ip/polls/UpdateClient';
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
     request.fields['id']= _id.toString() ;
-    request.fields['telephone'] = _telephone;
+    request.fields['telephone'] = _telephone1;
     request.fields['email'] = _email.text;
     var response = await request.send();
     if (response.statusCode == 200) {
@@ -257,6 +257,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         // Update the state of the phone variable
                                         setState(() {
                                           _telephone = phone.completeNumber;
+                                          _telephone1= phone.completeNumber;
                                         });
                                       },
                                     )

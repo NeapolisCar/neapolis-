@@ -146,7 +146,10 @@ class _TransferState extends State<Transfer> {
   Widget buildImage(String urlImage, int index) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 5),
-      child: Image.network(urlImage, fit: BoxFit.cover),
+      child: Image.network(urlImage, fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+        ),
+      ),
     );
   }
   bool isDateTodayOrFuture(DateTime date) {
@@ -405,7 +408,10 @@ class _TransferState extends State<Transfer> {
                         child: Row(
                           children: [
                             const Icon(Icons.location_pin),
-                            Text(value.addressDepart),
+                            Expanded(child:Text(value.addressDepart,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ), )
                           ],
                         ),
                       );

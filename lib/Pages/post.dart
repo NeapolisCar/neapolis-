@@ -68,6 +68,8 @@ class _ListPostState extends State<ListPost> {
                         post.photo,
                         // width: 152,
                         // height: 99,
+                        errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                      ),
                       ),
                       ExpansionTile(
                         childrenPadding: const EdgeInsets.symmetric(

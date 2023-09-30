@@ -466,15 +466,13 @@ class _ListVoituresState extends State<ListVoitures> {
                                   children: [
                                     Column(
                                         children: [
-                                          voiture.photo!=""?
                                       Image.network(
                                         voiture.photo,
                                         width: 152,
                                         height: 99,
-                                      ):Image.asset("assets/images/default_image.jpg",
-                                            width: 152,
-                                            height: 99,
-                                          ),
+                                        errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                        ),
+                                      ),
                                       SizedBox(height: 50),
                                       Text(
                                         voiture.modele == "mercidies"

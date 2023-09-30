@@ -374,15 +374,13 @@ class _ListVoitureState extends State<ListVoiture> {
                                           children: [
                                             Column(
                                                 children: [
-                                                  voiture.photo!=""?
                                               Image.network(
                                                 voiture.photo,
                                                 width: 152,
                                                 height: 99,
-                                              ):Image.asset("assets/images/default_image.jpg",
-                                                    width: 152,
-                                                    height: 99,
-                                                  ),
+                                                errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                                ),
+                                              ),
                                               const SizedBox(height: 50),
                                               Text(
                                                 (voiture.prixJour * _days!)
