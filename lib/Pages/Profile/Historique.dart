@@ -172,6 +172,7 @@ class _HistoriqueState extends State<Historique> {
           return Demande.fromJson(json);
         }).toList();
       });
+      _fetchDemande(id);
     } else {
       throw Exception('Failed to load voitures');
     }
