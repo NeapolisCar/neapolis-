@@ -41,31 +41,72 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String email = '';
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
-    _id = prefs.getInt('id')!;
-    List<Client> client = [];
-    final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Client'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, int>{
-        'id': _id,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<Client> client = jsonDecode(response.body)
-          .map<Client>((json) => Client.fromJson(json))
-          .toList();
-      setState(() {
-        _Client = client;
-        if (_Client.isNotEmpty) {
-          email = _Client.first.email;
-          _image = _Client.first.photo;
-          _telephone=_Client.first.telephone;
+    if (prefs.containsKey('id')) {
+      _id = prefs.getInt('id')!;
+      List<Client> client = [];
+      final response = await http.post(
+        Uri.parse('$ip/polls/Afficher_Client'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, int>{
+          'id': _id,
+        }),
+      );
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                  email = _Client.first.email;
+                  _image = _Client.first.photo;
+                  _telephone=_Client.first.telephone;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
         }
-      });
-    } else {
-      throw Exception('Failed to load notifications');
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
+      }
     }
   }
   Future<void> _save() async {
@@ -83,32 +124,47 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final prefs = await SharedPreferences.getInstance();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
-      final String reponse = jsonData['Reponse'];
-      if (reponse == "Failed") {
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message11,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else if( reponse =="Success"){
+      switch (jsonData['Reponse']) {
+        case "Success":
+      {
         Navigator.pushNamed(context, 'Parametres');
       }
-      else{
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message11,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+      break;
+        case "verife mot de passe":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).edit_Profile_it_Profile_message2,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
       }
-    }
-    else {
-      throw Exception('Failed to update');
+    } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
   Future<void> _changemotdepasse(String mot_de_passe, String nmot_de_passe, String cmot_de_passe) async {
@@ -128,31 +184,49 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }),
       );
       if (response.statusCode == 200) {
-        final _text = response.body.toString();
-        if (_text == "secc") {
-          Navigator.pushNamed(context, 'Parametres');
-        } else {
-          Fluttertoast.showToast(
-              msg: _text,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.grey[600],
-              textColor: Colors.white,
-              fontSize: 16.0);
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              Navigator.pushNamed(context, 'Parametres');
+            }
+            break;
+          case "verife mot de passe":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).edit_Profile_it_Profile_message2,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
         }
       } else {
-        throw Exception('Failed to update');
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
       }
-    } else {
-      Fluttertoast.showToast(
-          msg:  translation(context).edit_Profile_it_Profile_message1,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[600],
-          textColor: Colors.white,
-          fontSize: 16.0);
     }
   }
   @override

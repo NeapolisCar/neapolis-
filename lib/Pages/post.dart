@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -31,14 +32,52 @@ class _ListPostState extends State<ListPost> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _Posts = jsonData.map((json) {
-          return Post.fromJson(json);
-        }).toList();
-      });
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+          setState(() {
+            _Posts = jsonData.map((json) {
+              return Post.fromJson(json);
+            }).toList();
+          });
+    }  break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
-      throw Exception('Failed to load Post');
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 

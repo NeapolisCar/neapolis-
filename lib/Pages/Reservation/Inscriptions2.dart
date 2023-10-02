@@ -180,29 +180,6 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
   }
   void Login1() {
     switch (_type) {
-      case "Reservation":
-        {
-          Navigator.pushNamed(context, 'LoginTrnasfer', arguments: {
-            'type': _type,
-            'dateRamasser': _dateRamasser,
-            'dateRevenir': _dateRevenir,
-            'location_de_rammaser': _location_de_rammaser,
-            'location_de_revenir': _location_de_revenir,
-            'days': _days,
-            'numeroSeries': _numeroSeries,
-            'prixToutal': _prixToutal,
-            'modele': _modele,
-            'prixJour': _prixJour,
-            'photo': _photo,
-            'PLEIN ESSENCE': _PLEIN_SSENCE,
-            'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
-            'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
-            'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
-            'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
-          });
-        }
-        break;
-
       case "Transfer":
         {
           Navigator.pushNamed(context, 'LoginTrnasfer', arguments: {
@@ -222,7 +199,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
         break;
       case "Exurcion":
         {
-          Navigator.pushNamed(context, 'login', arguments: {
+          Navigator.pushNamed(context, 'LoginTrnasfer', arguments: {
             'type': _type,
             'dateRamasser': _dateRamasser,
             'idlistexurion':_idlistexurion,
@@ -333,82 +310,95 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
       final prefs = await SharedPreferences.getInstance();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
-      final String reponse = jsonData['Reponse'].toString();
-      if (reponse == "error") {
-        Fluttertoast.showToast(
-            msg: "Error",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else if (reponse == "email déjà utilisé") {
-        Fluttertoast.showToast(
-            msg:  translation(context).inscriotion_message13,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else {
-        prefs.setInt('id', int.parse(reponse) );
-        Fluttertoast.showToast(
-            msg: "Secc",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        switch (_type) {
-          case "Transfer":
-            {
-              Navigator.pushNamed(context, 'ResultTransfer', arguments: {
-                'type': _type,
-                'dateRamasser': _dateRamasser,
-                'idlisttransfer': _idlisttransfer,
-                'allez_retour': _allez_retour,
-                'prixTransfer': _prixtoul,
-                'SIÈGE BÉBÉ': _siege_bebe,
-                'Nombre de place': _nb_place,
-                'Nombre de bagages': _nb_bagage,
-                'numeroSeries': _numeroSeries,
-                'modele': _modele,
-                'photo': _photo,
-              });
+      switch (jsonData['Reponse']) {
+        case "Success":
+          {
+            final int id = jsonData['id'];
+            prefs.setInt('id', id);
+            switch (_type) {
+              case "Transfer":
+                {
+                  Navigator.pushNamed(context, 'ResultTransfer', arguments: {
+                    'type': _type,
+                    'dateRamasser': _dateRamasser,
+                    'idlisttransfer': _idlisttransfer,
+                    'allez_retour': _allez_retour,
+                    'prixTransfer': _prixtoul,
+                    'SIÈGE BÉBÉ': _siege_bebe,
+                    'Nombre de place': _nb_place,
+                    'Nombre de bagages': _nb_bagage,
+                    'numeroSeries': _numeroSeries,
+                    'modele': _modele,
+                    'photo': _photo,
+                  });
+                }
+                break;
+              case "Exurcion":
+                {
+                  Navigator.pushNamed(context, 'ResultTransfer', arguments: {
+                    'type': _type,
+                    'dateRamasser': _dateRamasser,
+                    'idlistexurion': _idlistexurion,
+                    'prixTransfer': _prixtoul,
+                    'SIÈGE BÉBÉ': _siege_bebe,
+                    'Nombre de place': _nb_place,
+                    'Nombre de bagages': _nb_bagage,
+                    'numeroSeries': _numeroSeries,
+                    'modele': _modele,
+                    'photo': _photo,
+                  });
+                }
+                break;
             }
-            break;
-          case "Exurcion":
-            {
-              Navigator.pushNamed(context, 'ResultTransfer', arguments: {
-                'type': _type,
-                'dateRamasser': _dateRamasser,
-                'idlistexurion': _idlistexurion,
-                'prixTransfer': _prixtoul,
-                'SIÈGE BÉBÉ': _siege_bebe,
-                'Nombre de place': _nb_place,
-                'Nombre de bagages': _nb_bagage,
-                'numeroSeries': _numeroSeries,
-                'modele': _modele,
-                'photo': _photo,
-              });
-            }
-            break;
-        }
+          }
+          break;
+        case "email déjà utilisé":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message13,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 200,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 200,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 200,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
       }
     } else {
       Navigator.of(context).pop();
       Fluttertoast.showToast(
-          msg: "error",
+          msg: translation(context).inscriotion_message10,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
+          timeInSecForIosWeb: 200,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
     }
+
   }
   Widget ControlsBuilder(context , details){
     return  Column(

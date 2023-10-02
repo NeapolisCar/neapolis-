@@ -30,6 +30,7 @@ class _ListVoituresState extends State<ListVoitures> {
   List<Options> _Options = [];
   int? _idlisttransfer;
   int? _idlistexurion;
+  bool loading = true;
   String dropdownvalue = "prix_decroissant";
   final List<String> _items = [
     "prix_decroissant",
@@ -219,71 +220,109 @@ class _ListVoituresState extends State<ListVoitures> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _Options = jsonData.map((json) {
-          return Options.fromJson(json);
-        }).toList();
-      });
-      return showModalBottomSheet(
-        context: context,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-        builder: (context) => Card(
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+          setState(() {
+            _Options = jsonData.map((json) {
+              return Options.fromJson(json);
+            }).toList();
+          });
+          return showModalBottomSheet(
+            context: context,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
-            ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(model),
-                    Image.network(
-                      photo,
-                      width: 152,
-                      height: 99,
-                    ),
-                    // Add spacing between the TableRows
-                    Table(
-                      children: _Options.map((option) => TableRow(
-                        children: [
-                          Row(
-                              children: [
-                                Flexible(
-                                    child: Text(option.title)
-                                ),
-                              ]
-                          ),
-                          SizedBox(height: 10,),
-                          Row(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+            builder: (context) => Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(model),
+                        Image.network(
+                          photo,
+                          width: 152,
+                          height: 99,
+                        ),
+                        // Add spacing between the TableRows
+                        Table(
+                          children: _Options.map((option) => TableRow(
                             children: [
-                              option.descriptions=="true"? SvgPicture.asset(
-                                "assets/images/img_checkmark.svg",
-                                width: 38,
-                                height: 23,
-                              ):
-                              Flexible(
-                                  child:Text(option.descriptions)
+                              Row(
+                                  children: [
+                                    Flexible(
+                                        child: Text(option.title)
+                                    ),
+                                  ]
                               ),
+                              SizedBox(height: 10,),
+                              Row(
+                                children: [
+                                  option.descriptions=="true"? SvgPicture.asset(
+                                    "assets/images/img_checkmark.svg",
+                                    width: 38,
+                                    height: 23,
+                                  ):
+                                  Flexible(
+                                      child:Text(option.descriptions)
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10,),
                             ],
                           ),
-                          SizedBox(height: 10,),
-                        ],
-                      ),
 
-                      ).toList(),
+                          ).toList(),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            )
+                  ),
+                )
 
-        ),
-      );
+            ),
+          );
+    } break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
-      throw Exception('Failed to load Options');
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -308,12 +347,44 @@ class _ListVoituresState extends State<ListVoitures> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _voitures = jsonData.map((json) {
-          return Voiture.fromJson(json);
-        }).toList();
-      });
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _voitures = jsonData.map((json) {
+                return Voiture.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -323,6 +394,7 @@ class _ListVoituresState extends State<ListVoitures> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -352,10 +424,11 @@ class _ListVoituresState extends State<ListVoitures> {
   }
   @override
   void initState() {
-    super.initState();
     testInternet();
     getData();
     _loadId();
+    super.initState();
+
   }
 
   @override
@@ -431,8 +504,7 @@ class _ListVoituresState extends State<ListVoitures> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: _voitures != null
-                        ? Column(
+                    child: _voitures != null ?  Column(
                       children: _voitures
                           .map(
                             (voiture) =>  InkWell(
@@ -689,8 +761,7 @@ class _ListVoituresState extends State<ListVoitures> {
                       )
                           .toList(),
                     )
-                        : Center(
-                      child: CircularProgressIndicator(),
+                          :Center(child: Text(translation(context).liste_de_voitures_message1)  ,
                     ),
                   ),
                 ),

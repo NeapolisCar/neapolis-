@@ -40,7 +40,6 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
     "sousse",
     "aeroport_enfidha",
     "aeroport_monastir",
-    "aéroport_sfax"
   ];
   late bool value1 = false;
   late double _prix = 0;
@@ -187,7 +186,10 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                       child: Row(
                         children: [
                           const Icon(Icons.location_pin),
-                          Text(translation(context).list(value)),
+                          Expanded(child: Text(translation(context).list(value),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ), )
                         ],
                       ),
                     );
@@ -230,7 +232,10 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                         child: Row(
                           children: [
                             const Icon(Icons.location_pin),
-                            Text(translation(context).list(value)),
+                            Expanded(child: Text(translation(context).list(value),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ), )
                           ],
                         ),
                       );

@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:neapolis_car/Pages/Navigation_components/MyDrawer.dart';
 import 'package:neapolis_car/Pages/Navigation_components/userNavbar.dart';
 import 'dart:convert';
@@ -26,6 +27,7 @@ class _HistoriqueState extends State<Historique> {
   late bool value = false;
   late int id = 0;
   bool isInternet = false;
+  bool loading = true;
   List<Demande> _demande = [];
   final TextEditingController _description = TextEditingController();
   Future<void> _fetchDemande(int id) async {
@@ -39,19 +41,57 @@ class _HistoriqueState extends State<Historique> {
       ),
     );
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _demande = jsonData.map((json) {
-          if (json['type'] == "Reservation") {
-            json['address_depart'] = ' ';
-            json['address_fin'] = ' ';
-          } else if (json['type'] == "Transfer") {
-            json['dateDeRevinier'] = ' ';
+      final responseData = jsonDecode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _demande = jsonData.map((json) {
+                if (json['type'] == "Reservation") {
+                  json['address_depart'] = ' ';
+                  json['address_fin'] = ' ';
+                } else if (json['type'] == "Transfer") {
+                  json['dateDeRevinier'] = ' ';
+                }
+                return Demande.fromJson(json);
+              }).toList();
+              loading= false;
+            });
           }
-          return Demande.fromJson(json);
-        }).toList();
-      });
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+      }
     } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
       throw Exception('Failed to load voitures');
     }
   }
@@ -159,21 +199,60 @@ class _HistoriqueState extends State<Historique> {
       }),
     );
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _demande = jsonData.map((json) {
-          if (json['type'] == "Reservation") {
-            json['address_depart'] = ' ';
-            json['address_fin'] = ' ';
-          } else if (json['type'] == "Transfer") {
-            json['dateDeRevinier'] = ' ';
+      final responseData = jsonDecode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = json.decode(response.body);
+            setState(() {
+              _demande = jsonData.map((json) {
+                if (json['type'] == "Reservation") {
+                  json['address_depart'] = ' ';
+                  json['address_fin'] = ' ';
+                } else if (json['type'] == "Transfer") {
+                  json['dateDeRevinier'] = ' ';
+                }
+                return Demande.fromJson(json);
+              }).toList();
+            });
+            Navigator.pushReplacementNamed(context, 'Historique');
           }
-          return Demande.fromJson(json);
-        }).toList();
-      });
-      Navigator.pushReplacementNamed(context, 'Historique');
+          break;
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
-      throw Exception('Failed to load voitures');
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -226,7 +305,7 @@ class _HistoriqueState extends State<Historique> {
       ),
       endDrawer: MyDrawer(selectedIndex: 2),
       body: SingleChildScrollView(
-                    child: _demande != null
+                    child:_description!=null
                         ? Column(
                             children: _demande
                                 .map(
@@ -447,9 +526,7 @@ class _HistoriqueState extends State<Historique> {
                                 )
                                 .toList(),
                           )
-                        : Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                          :Center(child: Text(translation(context).historique_message2))
                   ),
       bottomNavigationBar: UserNavBar(selectedIndex: _selectedIndex),
       )

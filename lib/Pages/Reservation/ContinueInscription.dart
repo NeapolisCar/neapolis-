@@ -23,28 +23,29 @@ class ContinueInscription extends StatefulWidget {
 class _ContinueInscriptionState extends State<ContinueInscription> {
   final TextEditingController _Numero_de_Permis = TextEditingController();
   final TextEditingController _Nom_Entreprise = TextEditingController();
-  late String Image_Parmis_Path = '';
+  String Image_Parmis_Path = '';
   late CameraController _controller;
-  late XFile? image_Parmis;
-  late bool _DEUXIEME_CONDUCTEUR = false;
-  late bool _REHAUSSEUR = false;
-  late bool _SYSTEME_DE_NAVIGATION_GPS = false;
-  late bool _SIEGE_BEBE = false;
-  late bool _PLEIN_SSENCE = false;
-  late DateTime? _dateRamasser;
-  late DateTime? _dateRevenir;
-  late String? _location_de_rammaser;
-  late String? _location_de_revenir;
-  late int _days = 1;
-  late String _numeroSeries = "";
-  late double _prixToutal = 0;
-  late double _prixJour = 0;
-  late double _caution = 0;
-  late String _modele = "";
-  late String _photo = "";
-  late String _type = "";
-  late int _id =0;
-  late int index = 0;
+  XFile? image_Parmis;
+  bool _DEUXIEME_CONDUCTEUR = false;
+  bool _REHAUSSEUR = false;
+  bool _SYSTEME_DE_NAVIGATION_GPS = false;
+  bool _SIEGE_BEBE = false;
+  bool _PLEIN_SSENCE = false;
+  DateTime? _dateRamasser;
+  DateTime? _dateRevenir;
+  String? _location_de_rammaser;
+  String? _location_de_revenir;
+  int _days = 1;
+  String _numeroSeries = "";
+  double _prixToutal = 0;
+  double _prixJour = 0;
+  double _prix =0;
+  double _caution = 0;
+  String _modele = "";
+  String _photo = "";
+  String _type = "";
+  int _id =0;
+  int index = 0;
   String getImageNameFromPath(String path) {
     List<String> pathParts = path.split('/');
     return pathParts.last;
@@ -92,44 +93,62 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
       Navigator.of(context).pop();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
-      final String reponse = jsonData['Reponse'];
-      if (reponse == "error") {
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message11,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else {
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message12,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        Navigator.pushNamed(context, 'ResultReservation', arguments: {
-          'type': _type,
-          'dateRamasser': _dateRamasser,
-          'dateRevenir': _dateRevenir,
-          'location_de_rammaser': _location_de_rammaser,
-          'location_de_revenir': _location_de_revenir,
-          'days': _days,
-          'numeroSeries': _numeroSeries,
-          'prixToutal': _prixToutal,
-          'modele': _modele,
-          'prixJour': _prixJour,
-          'caution': _caution,
-          'photo': _photo,
-          'PLEIN ESSENCE': _PLEIN_SSENCE,
-          'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
-          'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
-          'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
-          'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
-        });
+      switch (jsonData['Reponse']){
+        case "Success":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message12,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+            Navigator.pushNamed(context, 'ResultReservation', arguments: {
+              'type': _type,
+              'dateRamasser': _dateRamasser,
+              'dateRevenir': _dateRevenir,
+              'location_de_rammaser': _location_de_rammaser,
+              'location_de_revenir': _location_de_revenir,
+              'days': _days,
+              'numeroSeries': _numeroSeries,
+              'prixToutal': _prixToutal,
+              'modele': _modele,
+              'prixJour': _prixJour,
+              'prix':_prix,
+              'caution': _caution,
+              'photo': _photo,
+              'PLEIN ESSENCE': _PLEIN_SSENCE,
+              'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
+              'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
+              'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
+              'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
+            });
+          }
+          break;
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
       }
     } else {
       Navigator.of(context).pop();
@@ -236,6 +255,7 @@ class _ContinueInscriptionState extends State<ContinueInscription> {
           _prixJour = arguments['prixJour'] as double;
           _caution = arguments['caution'] as double;
           _prixToutal = arguments['prixToutal'] as double;
+          _prix= arguments['prix'] as double;
           _modele = arguments['modele'] as String;
           _photo = arguments['photo'] as String;
           _PLEIN_SSENCE = arguments['PLEIN ESSENCE'] as bool;

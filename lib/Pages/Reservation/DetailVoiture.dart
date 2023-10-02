@@ -48,6 +48,7 @@ class _DetailVoitureState extends State<DetailVoiture> {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('id')) {
       id = prefs.getInt('id')!;
+      List<Client> client = [];
       final response = await http.post(
         Uri.parse('$ip/polls/Afficher_Client'),
         headers: <String, String>{
@@ -58,16 +59,47 @@ class _DetailVoitureState extends State<DetailVoiture> {
         }),
       );
       if (response.statusCode == 200) {
-        final List<Client> client = jsonDecode(response.body)
-            .map<Client>((json) => Client.fromJson(json))
-            .toList();
-        setState(() {
-          _Client = client;
-          _session = true;
-          if (_Client.isNotEmpty) {
-            _numeroparmis = _Client.first.numeroparmis;
-          }
-        });
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                _session = true;
+                if (_Client.isNotEmpty) {
+                  _numeroparmis = _Client.first.numeroparmis;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+        }
       } else {
         Fluttertoast.showToast(
             msg: translation(context).inscriotion_message11,
@@ -77,7 +109,7 @@ class _DetailVoitureState extends State<DetailVoiture> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        throw Exception('Failed to load notifications');
+        throw Exception('Failed to load data from the API');
       }
     }
   }

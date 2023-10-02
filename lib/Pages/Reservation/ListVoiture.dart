@@ -41,6 +41,7 @@ class _ListVoitureState extends State<ListVoiture> {
   double _prix = 0;
   String _type = "";
   bool isInternet = false;
+  bool loading = true;
 
   Future<void> getData() async {
     while (_days == null || _dateRamasser == DateTime.now()) {
@@ -61,68 +62,100 @@ class _ListVoitureState extends State<ListVoiture> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _Options = jsonData.map((json) {
-          return Options.fromJson(json);
-        }).toList();
-      });
-      return showModalBottomSheet(
-          context: context,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-          builder: (context) => Card(
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _Options = jsonData.map((json) {
+                return Options.fromJson(json);
+              }).toList();
+            });
+            return showModalBottomSheet(
+              context: context,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
-              ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(model),
-                        Image.network(
-                          photo,
-                          width: 152,
-                          height: 99,
-                        ),
-                        // Add spacing between the TableRows
-                        Table(
-                          children: _Options.map((option) => TableRow(
-                            children: [
-                              Row(
-                                  children: [
-                          Flexible(
-                                   child: Text(option.title)
-                              ),
-                                  ]
-                              ),
-                              const SizedBox(height: 10,),
-                              Row(
-                                children: [
-                                  option.descriptions=="true"? SvgPicture.asset(
-                                    "assets/images/img_checkmark.svg",
-                                    width: 38,
-                                    height: 23,
-                                  ):
-                                  Flexible(
-                                    child:Text(option.descriptions)
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10,),
-                            ],
-                          ),
-
-                          ).toList(),
-                        ),
-                      ],
-                    ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+              builder: (context) => Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
                   ),
-                )
-                ),
-              );
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(model),
+                          Image.network(
+                            photo,
+                            width: 152,
+                            height: 99,
+                          ),
+                          // Add spacing between the TableRows
+                          Table(
+                            children: _Options.map((option) => TableRow(
+                              children: [
+                                Row(
+                                    children: [
+                                      Flexible(
+                                          child: Text(option.title)
+                                      ),
+                                    ]
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    option.descriptions=="true"? SvgPicture.asset(
+                                      "assets/images/img_checkmark.svg",
+                                      width: 38,
+                                      height: 23,
+                                    ):
+                                    Flexible(
+                                        child:Text(option.descriptions)
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                              ],
+                            ),
+
+                            ).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+
+              ),
+            );
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -132,10 +165,9 @@ class _ListVoitureState extends State<ListVoiture> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-      throw Exception('Failed to load Options');
+      throw Exception('Failed to load data from the API');
     }
   }
-
   Future<void> fetchVoitures() async {
     final response = await http.post(
       Uri.parse('$ip/polls/Afficher_Voitures'),
@@ -149,12 +181,44 @@ class _ListVoitureState extends State<ListVoiture> {
       ),
     );
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _voitures = jsonData.map((json) {
-          return Voiture.fromJson(json);
-        }).toList();
-      });
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _voitures = jsonData.map((json) {
+                return Voiture.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -164,7 +228,7 @@ class _ListVoitureState extends State<ListVoiture> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-      throw Exception('Failed to load voitures');
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -182,40 +246,68 @@ class _ListVoitureState extends State<ListVoiture> {
       ),
     );
     if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      if(jsonData.containsKey('numerSeries'))
-      {
-          final String numeroSeries  = jsonData['numerSeries'];
-          final prixToutal = prixJour * _days!;
-          Navigator.pushNamed(context, 'detailVoiture', arguments: {
-              'type': _type,
-              'dateRamasser': _dateRamasser,
-              'dateRevenir': _dateRevenir,
-              'location_de_rammaser': _location_de_rammaser,
-              'location_de_revenir': _location_de_revenir,
-              'days': _days,
-              'numeroSeries': numeroSeries,
-              'prixToutal': prixToutal + _prix,
-              'caution': caution,
-              'prixJour': prixJour,
-              'prix': _prix,
-              'modele': modele,
-              'photo': photo,
-              'index': 0
-          });
-      } else {
-      Fluttertoast.showToast(
-        msg: translation(context).inscriotion_message11,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
-        }
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+              final String numeroSeries  = responseData['numerSeries'];
+              final prixToutal = prixJour * _days!;
+              Navigator.pushNamed(context, 'detailVoiture', arguments: {
+                'type': _type,
+                'dateRamasser': _dateRamasser,
+                'dateRevenir': _dateRevenir,
+                'location_de_rammaser': _location_de_rammaser,
+                'location_de_revenir': _location_de_revenir,
+                'days': _days,
+                'numeroSeries': numeroSeries,
+                'prixToutal': prixToutal + _prix,
+                'caution': caution,
+                'prixJour': prixJour,
+                'prix': _prix,
+                'modele': modele,
+                'photo': photo,
+                'index': 0
+              });
+            } break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
-          // ignore: use_build_context_synchronously
           msg: translation(context).inscriotion_message11,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
@@ -223,6 +315,7 @@ class _ListVoitureState extends State<ListVoiture> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
 
   }
@@ -346,8 +439,7 @@ class _ListVoitureState extends State<ListVoiture> {
                 Expanded(
                   child: SingleChildScrollView(
                     // ignore: unnecessary_null_comparison
-                    child: _voitures != null
-                        ? Column(
+                    child: _voitures != null?  Column(
                             children: _voitures
                                 .map(
                                   (voiture) => InkWell(
@@ -576,10 +668,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                       ),
                                   )
                             ).toList(),
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                          ) :Center(child: Text(translation(context).liste_de_voitures_message1)),
                   ),
                 ),
               ],

@@ -12,7 +12,9 @@ import 'package:neapolis_car/Pages/Compounes/datepicker.dart';
 import 'package:neapolis_car/Pages/Compounes/dropitem.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 import 'package:neapolis_car/main.dart';
-import 'package:translator/translator.dart';
+
+
+// import 'package:translator/translator.dart';
 import 'package:intl/intl.dart';
 
 class Transfer extends StatefulWidget {
@@ -32,7 +34,7 @@ class _TransferState extends State<Transfer> {
   String dropdownvalue4 = "";
   String dropdownvalue5 = "";
   ListExurcion? _Exurcion;
-  final translator = GoogleTranslator();
+  // final translator = GoogleTranslator();
   List<Map<String, dynamic>>? jsonDataList;
   int? idlisttransfer;
   int? idlistexurion;
@@ -49,24 +51,54 @@ class _TransferState extends State<Transfer> {
       if (Addres!= item.addressDepart){
         Addres=item.addressDepart;
         setState(() {
-          _items3.add(item.addressDepart);
-          _items4.add(item.addressDepart);
+          _items3.add(item.addressDepart );
+          _items4.add(item.addressDepart );
         });
       }
     }
   }
 
-  Future<void> fatcheLisTransfer()async{
+  Future<void> fatcheLisTransfer()async {
     final response = await http.post(Uri.parse("$ip/polls/AfficherListTransfer"));
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _ListTransfer = jsonData.map((json) {
-          return LisTransfer.fromJson(json);
-        }).toList();
-      });
-
-      InsertList();
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    switch (responseData['Reponse']) {
+      case "Success":
+        {
+          final List<dynamic> jsonData = responseData['data'];
+          setState(() {
+            _ListTransfer = jsonData.map((json) {
+              return LisTransfer.fromJson(json);
+            }).toList();
+          });
+          InsertList();
+        }
+        break;
+      case "Not Exist":
+        {
+          Fluttertoast.showToast(
+              msg: translation(context).inscriotion_message11,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.TOP,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        break;
+      case "Faild":
+        {
+          Fluttertoast.showToast(
+              msg: translation(context).inscriotion_message11,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.TOP,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -82,16 +114,44 @@ class _TransferState extends State<Transfer> {
   Future<void> fatchListExurcion()async{
     final response = await http.post(Uri.parse("$ip/polls/AfficherListExurcion"));
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        final listExurcion = jsonData.map((json) {
-          return ListExurcion.fromJson(json);
-        }).cast<ListExurcion>().toList();
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+        final List<dynamic> jsonData = responseData['data'];
         setState(() {
-          _ListExurcion= listExurcion;
+          final listExurcion = jsonData.map((json) {
+            return ListExurcion.fromJson(json);
+          }).cast<ListExurcion>().toList();
+          _ListExurcion = listExurcion;
         });
-      });
-
+      }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -103,26 +163,58 @@ class _TransferState extends State<Transfer> {
           fontSize: 16.0);
       throw Exception('Failed to load data from the API');
     }
+
   }
   Future<void> fatchGallery()async{
     final response = await http.post(Uri.parse("$ip/polls/Afficher_Gallery"));
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        final gallers = jsonData.map((json) {
-          return Gallery.fromJson(json);
-        }).cast<Gallery>().toList();
-        setState(() {
-          gallery= gallers;
-        });
-        setState(() {
-          images = gallery
-              .where((galleryItem) => galleryItem.listExurcion == gallery.first.listExurcion)
-              .map((galleryItem) => galleryItem.photo)
-              .toList();
-        });
-      });
-
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              final gallers = jsonData.map((json) {
+                return Gallery.fromJson(json);
+              }).cast<Gallery>().toList();
+              setState(() {
+                gallery= gallers;
+              });
+              setState(() {
+                images = gallery
+                    .where((galleryItem) => galleryItem.listExurcion == gallery.first.listExurcion)
+                    .map((galleryItem) => galleryItem.photo)
+                    .toList();
+              });
+            });
+            print("aaaaaaaaaaaaaaaaa");
+    }
+    break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
