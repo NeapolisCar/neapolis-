@@ -98,6 +98,11 @@ class _ResultResrvationState extends State<ResultResrvation> {
                   fontSize: 16.0);
             }
             break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
       } else {
         Fluttertoast.showToast(

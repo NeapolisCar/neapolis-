@@ -85,6 +85,11 @@ class _UserNavBarState extends State<UserNavBar> {
                   fontSize: 16.0);
             }
             break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
       } else {
         Fluttertoast.showToast(

@@ -100,6 +100,11 @@ class _MyDrawerState extends State<MyDrawer> {
                   fontSize: 16.0);
             }
             break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
       } else {
         Fluttertoast.showToast(

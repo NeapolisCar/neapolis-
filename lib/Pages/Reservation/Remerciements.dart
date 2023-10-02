@@ -81,6 +81,11 @@ class _RemerciementsState extends State<Remerciements> {
                   fontSize: 16.0);
             }
             break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
       } else {
         Fluttertoast.showToast(
