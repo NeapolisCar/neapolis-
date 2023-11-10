@@ -44,6 +44,8 @@ class _TransferState extends State<Transfer> {
   List<String> _items4 = [];
   List<Gallery> gallery =[];
   List<String> images =[];
+  final CarouselController carouselController = CarouselController();
+  int currentIndex = 0;
   final List<String> _items5 = ["transfer", "exurcion"];
   void InsertList(){
     String Addres="";
@@ -512,14 +514,67 @@ class _TransferState extends State<Transfer> {
                   ),
                 ),
               ),
-              CarouselSlider.builder(
-                  itemCount: images.length,
-                  itemBuilder: (context,index,realIndex){
-                    final urlImage = images[index];
-                    return buildImage(urlImage,index);
-                  },
-                  options: CarouselOptions(height: 400)
-              )
+              Padding(padding: EdgeInsets.all(16),
+                child:Column(
+                    children: [
+                      Stack(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              print(currentIndex);
+                            },
+                            child: CarouselSlider(
+                              items: images
+                                  .map(
+                                    (item) => Image.network(
+                                  item,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              )
+                                  .toList(),
+                              carouselController: carouselController,
+                              options: CarouselOptions(
+                                scrollPhysics: const BouncingScrollPhysics(),
+                                autoPlay: true,
+                                aspectRatio: 2,
+                                viewportFraction: 1,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    currentIndex = index;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 10,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: images.asMap().entries.map((entry) {
+                                return GestureDetector(
+                                  onTap: () => carouselController.animateToPage(entry.key),
+                                  child: Container(
+                                    width: currentIndex == entry.key ? 17 : 7,
+                                    height: 7.0,
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 3.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: currentIndex == entry.key
+                                            ? Colors.red
+                                            : Colors.teal),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]),),
             ],
           )
 

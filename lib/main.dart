@@ -28,7 +28,7 @@ import 'package:neapolis_car/Pages/post.dart';
 import 'firebase_options.dart';
 
 late List<CameraDescription> cameras;
-const ip = "http://192.168.1.194:8000";
+const ip = "https://neapolisrentcar.com";
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();

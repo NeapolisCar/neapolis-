@@ -23,7 +23,7 @@
         </intent>
     </queries>
     <application
-        android:label="neapolis_car"
+        android:label="neapolis+"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         

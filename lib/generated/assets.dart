@@ -37,7 +37,6 @@ class Assets {
   static const String imagesImgTlcharg1 = 'assets/images/img_tlcharg1.png';
   static const String imagesImgVector = 'assets/images/img_vector.svg';
   static const String imagesImgVisamastericon29 = 'assets/images/img_visamastericon29.png';
-  static const String imagesIntelDriverAndSupportAssistantInstaller = 'assets/images/Intel-Driver-and-Support-Assistant-Installer.exe';
   static const String imagesLogoNeapolisV444 = 'assets/images/logo-neapolisV444.png';
   static const String imagesPw1207FreeOnline = 'assets/images/pw1207-free-online.exe';
   static const String imagesUser = 'assets/images/user.jpg';

@@ -203,19 +203,22 @@ class _HistoriqueState extends State<Historique> {
       switch (responseData['Reponse']) {
         case "Success":
           {
-            final List<dynamic> jsonData = json.decode(response.body);
+            // final List<dynamic> jsonData = json.decode(response.body);
+            // setState(() {
+            //   _demande = jsonData.map((json) {
+            //     if (json['type'] == "Reservation") {
+            //       json['address_depart'] = ' ';
+            //       json['address_fin'] = ' ';
+            //     } else if (json['type'] == "Transfer") {
+            //       json['dateDeRevinier'] = ' ';
+            //     }
+            //     return Demande.fromJson(json);
+            //   }).toList();
+            // });
+            // Navigator.pushReplacementNamed(context, 'Historique');
             setState(() {
-              _demande = jsonData.map((json) {
-                if (json['type'] == "Reservation") {
-                  json['address_depart'] = ' ';
-                  json['address_fin'] = ' ';
-                } else if (json['type'] == "Transfer") {
-                  json['dateDeRevinier'] = ' ';
-                }
-                return Demande.fromJson(json);
-              }).toList();
+              _demande = _demande.where((item) => item.id != id).toList();
             });
-            Navigator.pushReplacementNamed(context, 'Historique');
           }
           break;
         case "error":
