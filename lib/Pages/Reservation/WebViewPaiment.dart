@@ -297,10 +297,10 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
   }
 
   verify(String url) async {
-    if (url == "https://dev.konnect.network/gateway/payment-failure?payment_ref=" +
+    if (url == "https://dev.konnect.network/gateway/payment-success?payment_ref=" +
             _paymentRef) {
       final response = await http.get(
-        Uri.parse('https://api.preprod.konnect.network/api/v2/payments/' +
+        Uri.parse('https://api.konnect.network/api/v2/payments/:' +
             _paymentRef),
       );
       switch (response.statusCode) {
@@ -407,6 +407,14 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
           }
           break;
       }
+    }
+    else if (url == "https://dev.konnect.network/gateway/payment-failure?payment_ref" +
+        _paymentRef){
+      final response = await http.get(
+        Uri.parse('https://api.konnect.network/api/v2/payments/:paymentId' +
+            _paymentRef),
+      );
+      controller.loadUrl(_url);
     }
   }
   void clickButton() async {

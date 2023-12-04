@@ -28,7 +28,7 @@ import 'package:neapolis_car/Pages/post.dart';
 import 'firebase_options.dart';
 
 late List<CameraDescription> cameras;
-const ip = "https://neapolisrentcar.com";
+const ip = "https://backend-liard-three.vercel.app";
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
@@ -70,7 +70,6 @@ class _MyappState extends State<Myapp> {
       debugShowCheckedModeBanner: false,
       initialRoute: 'reservation',
       routes: {
-        // '/': (context) => MyHomePage(),
         'reservation': (context) => Reservation(),
         'listVoiture': (context) => ListVoiture(),
         'detailVoiture': (context) => DetailVoiture(),

@@ -358,6 +358,11 @@ class _ResultResrvationState extends State<ResultResrvation> {
     _SIEGE_BEBE = arguments['SIÈGE BÉBÉ ( 6-24 MOIS)'] as bool;
     return WillPopScope(
       onWillPop: () async {
+        if(_PLEIN_SSENCE){
+          setState(() {
+            _prixToutal= _prixToutal - 120;
+          });
+        }
         Navigator.pushNamed(context, 'detailVoiture', arguments: {
           'type': _type,
           'dateRamasser': _dateRamasser,

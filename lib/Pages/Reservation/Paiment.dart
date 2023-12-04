@@ -695,6 +695,8 @@ class _PiamentState extends State<Piament> {
                 'modele': _modele,
                 'prixJour': _prixJour,
                 'photo': _photo,
+                'caution':_caution,
+                'prix': _prix,
                 'PLEIN ESSENCE': _PLEIN_SSENCE,
                 'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
                 'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
