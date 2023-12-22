@@ -1,5 +1,5 @@
 plugins {
-    id "com.android.application"
+    id "com.android.neapolis"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -22,7 +22,7 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 android {
-    namespace "com.example.neapolis_car"
+//    namespace "com.example.neapolis_car"
     compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 

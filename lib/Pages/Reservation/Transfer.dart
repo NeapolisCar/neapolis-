@@ -189,7 +189,6 @@ class _TransferState extends State<Transfer> {
                     .toList();
               });
             });
-            print("aaaaaaaaaaaaaaaaa");
     }
     break;
         case "Not Exist":
@@ -279,26 +278,33 @@ class _TransferState extends State<Transfer> {
     }
   }
   void ChangeList2() {
-    if( dropdownvalue4 != "Tunisie" || dropdownvalue4!="Hammamet")
+    if(dropdownvalue3=="")
     {
+      if (dropdownvalue4 != "Tunisie" || dropdownvalue4 != "Hammamet") {
+        setState(() {
+          _items3 = ["Hammamet", "Tunisie"];
+        });
+      } else {
+        setState(() {
+          _items3 = [];
+        });
+        String Addres = "";
+        for (var item in _ListTransfer) {
+          if (Addres != item.addressDepart) {
+            Addres = item.addressDepart;
+            setState(() {
+              _items3.add(item.addressDepart);
+            });
+          }
+        }
+        setState(() {
+          _items3 = _items3.where((item) => item != dropdownvalue4).toList();
+        });
+      }
+    }
+    else if (dropdownvalue4 != "Tunisie" || dropdownvalue4 != "Hammamet"){
       setState(() {
         _items3 = ["Hammamet", "Tunisie"];
-      });
-    }  else{
-      setState(() {
-        _items3=[];
-      });
-      String Addres="";
-      for (var  item in _ListTransfer) {
-        if (Addres!= item.addressDepart){
-          Addres=item.addressDepart;
-          setState(() {
-            _items3.add(item.addressDepart);
-          });
-        }
-      }
-      setState(() {
-        _items3= _items3.where((item) => item !=dropdownvalue4 ).toList();
       });
     }
   }
@@ -328,6 +334,7 @@ class _TransferState extends State<Transfer> {
         final Transfers = _ListTransfer.where((transfer) {
           return transfer.addressDepart == dropdownvalue3 && transfer.addressFin == dropdownvalue4;
         }).first;
+        print(Transfer);
         Navigator.pushNamed(context, 'DetailTransfer', arguments: {
           'type': "Transfer",
           'dateRamasser': dateRamasser,
