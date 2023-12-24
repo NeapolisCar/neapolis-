@@ -253,6 +253,20 @@ class _TransferState extends State<Transfer> {
             date.month == tomorrow.month &&
             date.day == tomorrow.day;
   }
+  void ChangeList(String type){
+    if (type == "transfer") {
+      setState(() {
+        _Transfer = true;
+        _Exurion= false;
+      });
+    } else if (type == "exurcion") {
+      setState(() {
+        _Transfer = false;
+        _Exurion=true;
+        _Exurcion= _ListExurcion.first;
+      });
+    }
+  }
   void ChangeList1() {
     if( dropdownvalue3 != "Tunisie" &&  dropdownvalue3!="Hammamet")
       {
@@ -385,18 +399,19 @@ class _TransferState extends State<Transfer> {
           text: translation(context).reservation_Transfer_type,
           onItemSelected: (selectedValue) {
             dropdownvalue5 = selectedValue;
-            if (selectedValue == "transfer") {
-              setState(() {
-                _Transfer = true;
-                _Exurion= false;
-              });
-            } else if (selectedValue == "exurcion") {
-              setState(() {
-                _Transfer = false;
-                _Exurcion= _ListExurcion.first;
-                _Exurion=true;
-              });
-            }
+            ChangeList(dropdownvalue5);
+            // if (selectedValue == "transfer") {
+            //   setState(() {
+            //     _Transfer = true;
+            //     _Exurion= false;
+            //   });
+            // } else if (selectedValue == "exurcion") {
+            //   setState(() {
+            //     _Transfer = false;
+            //     _Exurcion= _ListExurcion.first;
+            //     _Exurion=true;
+            //   });
+            // }
           },
         ),
         Visibility(
