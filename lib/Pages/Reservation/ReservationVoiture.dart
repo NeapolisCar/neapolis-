@@ -174,7 +174,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: DropdownButton(
                   hint:
-                      Text(translation(context).reservation_Transfer_address1),
+                      Text(translation(context).reservation_voiture_message3),
                   value: dropdownvalue.isNotEmpty ? dropdownvalue : null,
                   onChanged: (newValue) {
                     setState(() {
@@ -219,7 +219,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: DropdownButton(
                     hint: Text(
-                        translation(context).reservation_Transfer_address1),
+                        translation(context).reservation_voiture_message4),
                     value: dropdownvalue2.isNotEmpty ? dropdownvalue2 : null,
                     onChanged: (newValue) {
                       setState(() {

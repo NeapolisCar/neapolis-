@@ -854,9 +854,6 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
                 ),
               )
           ),
-          SizedBox(
-          height: 10,
-          ),
           Card(
             margin: EdgeInsets.symmetric(horizontal: 16),
               shape: RoundedRectangleBorder(

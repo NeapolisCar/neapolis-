@@ -407,7 +407,7 @@ class _ListVoitureState extends State<ListVoiture> {
                       },
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        hintText: 'Recharche',
+                        hintText: translation(context).liste_de_voitures_recharche,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),

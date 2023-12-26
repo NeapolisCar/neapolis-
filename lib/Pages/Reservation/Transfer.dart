@@ -400,18 +400,6 @@ class _TransferState extends State<Transfer> {
           onItemSelected: (selectedValue) {
             dropdownvalue5 = selectedValue;
             ChangeList(dropdownvalue5);
-            // if (selectedValue == "transfer") {
-            //   setState(() {
-            //     _Transfer = true;
-            //     _Exurion= false;
-            //   });
-            // } else if (selectedValue == "exurcion") {
-            //   setState(() {
-            //     _Transfer = false;
-            //     _Exurcion= _ListExurcion.first;
-            //     _Exurion=true;
-            //   });
-            // }
           },
         ),
         Visibility(
@@ -462,7 +450,7 @@ class _TransferState extends State<Transfer> {
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child:
                     DropdownButton(
-                      hint: Text(translation(context).reservation_Transfer_address1),
+                      hint: Text(translation(context).reservation_Transfer_address2),
                       value: dropdownvalue4.isNotEmpty ? dropdownvalue4 : null,
                       onChanged: (newValue) {
                         setState(() {
