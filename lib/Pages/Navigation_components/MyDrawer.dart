@@ -23,7 +23,7 @@ class MyDrawer extends StatefulWidget {
 class _MyDrawerState extends State<MyDrawer> {
   late List<Client> _Client = [];
   late int id = 0;
-  late String _nomprenom = 'Visture';
+  late String _nomprenom = translation(context).visture;
   late String _image = '';
   late bool _session = false;
   var whatsappUrl = "whatsapp://send?phone=${"+21698307590"}";

@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:neapolis_car/Pages/Classes/Marque.dart';
 import 'package:neapolis_car/Pages/Compounes/dropitem.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'package:neapolis_car/Pages/Navigation_components/MyDrawer.dart';
@@ -25,6 +26,7 @@ class ListVoiture extends StatefulWidget {
 
 class _ListVoitureState extends State<ListVoiture> {
   List<Voiture> _voitures = [];
+  List<Marquer> _marquer =[];
   // ignore: non_constant_identifier_names
   List<Options> _Options = [];
   late String dropdownvalue = "prix_decroissant";
@@ -48,6 +50,7 @@ class _ListVoitureState extends State<ListVoiture> {
       await Future.delayed(const Duration(seconds: 1));
     }
     fetchVoitures();
+    fetchMarquer();
   }
 
   Future<void> Information(
@@ -99,7 +102,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                 Row(
                                     children: [
                                       Flexible(
-                                          child: Text(option.title)
+                                          child: Text(option.title,
+                                              style:Theme.of(context).textTheme.bodyText2)
                                       ),
                                     ]
                                 ),
@@ -112,7 +116,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                       height: 23,
                                     ):
                                     Flexible(
-                                        child:Text(option.descriptions)
+                                        child:Text(option.descriptions,
+                                            style:Theme.of(context).textTheme.bodyText2)
                                     ),
                                   ],
                                 ),
@@ -170,7 +175,7 @@ class _ListVoitureState extends State<ListVoiture> {
   }
   Future<void> fetchVoitures() async {
     final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Voitures'),
+      Uri.parse('$ip/polls/AvailableCarsViewSet'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -189,6 +194,68 @@ class _ListVoitureState extends State<ListVoiture> {
             setState(() {
               _voitures = jsonData.map((json) {
                 return Voiture.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+            setState(() {
+              _voitures =groupByModele(_voitures);
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
+    }
+  }
+
+  Future<void> fetchMarquer() async {
+    final response = await http.post(
+      Uri.parse('$ip/polls/Afficher_Marque'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _marquer = jsonData.map((json) {
+                return Marquer.fromJson(json);
               }).toList();
               loading=false;
             });
@@ -320,6 +387,27 @@ class _ListVoitureState extends State<ListVoiture> {
 
   }
 
+  String nom(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.nom;
+  }
+  String logo(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.logo;
+  }
+  List<Voiture> groupByModele(List<Voiture> voitures) {
+    List<Voiture> groupedVoitures = [];
+    String modele = "";
+
+    for (Voiture item in voitures) {
+      if (modele != item.modele) {
+        modele = item.modele;
+        groupedVoitures.add(item);
+      }
+    }
+
+    return groupedVoitures;
+  }
   void sortVoituresByPrice() {
     _voitures.sort((a, b) => a.prixJour.compareTo(b.prixJour));
   }
@@ -444,14 +532,11 @@ class _ListVoitureState extends State<ListVoiture> {
                                 .map(
                                   (voiture) => InkWell(
                                       onTap: () {
-                                        voiture.disponibilite ==
-                                            "disponible"
-                                            ? passage(
+                                        passage(
                                             voiture.prixJour,
                                             voiture.caution,
                                             voiture.modele,
-                                            voiture.photo)
-                                            : null;
+                                            voiture.photo);
                                       },
                                       child:  Card(
                                         margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -488,8 +573,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                               Text(_days.toString() +
                                                   translation(context)
                                                       .liste_de_voitures_jours),
-                                              voiture.disponibilite == "disponible"
-                                                  ? Row(
+                                              Row(
                                                       children: [
                                                         const FaIcon(
                                                           FontAwesomeIcons
@@ -501,20 +585,6 @@ class _ListVoitureState extends State<ListVoiture> {
                                                         const SizedBox(width: 5),
                                                         Text(AppLocalizations.of(context)!
                                                             .liste_de_voitures_Disponible),
-                                                      ],
-                                                    )
-                                                  : Row(
-                                                      children: [
-                                                        const FaIcon(
-                                                          // ignore: deprecated_member_use
-                                                          FontAwesomeIcons.cancel,
-                                                          color: Colors.red,
-                                                          size: 24,
-                                                        ),
-                                                        const SizedBox(width: 5),
-                                                        Text(AppLocalizations.of(
-                                                                context)!
-                                                            .liste_de_voitures_NoDisponible),
                                                       ],
                                                     ),
                                               const SizedBox(height: 10),
@@ -550,10 +620,11 @@ class _ListVoitureState extends State<ListVoiture> {
                                               children: [
                                                 Row(
                                                   children: [
-                                                    Text(voiture.marque),
+                                                    Text("${nom(voiture.id_marquer)}",
+                                                        style:Theme.of(context).textTheme.bodyText2),
                                                     const SizedBox(width: 10,),
                                                     Image.network(
-                                                      voiture.photoMarque,
+                                                      logo(voiture.id_marquer),
                                                       width: 50,
                                                       height: 50,
                                                     ),
@@ -562,9 +633,9 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 const SizedBox(height: 5),
                                                 Text(
                                                   voiture.modele,
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style:
+                                                      Theme.of(context).textTheme.caption
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Row(
@@ -578,7 +649,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbSeats +
+                                                        voiture.nbSeats.toString() +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_SEATS,
@@ -594,7 +665,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbBags +
+                                                        voiture.nbBags.toString() +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_BAGS,
@@ -615,7 +686,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbPorts +
+                                                        voiture.nbPorts.toString() +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_PORTES,
@@ -627,14 +698,11 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 const SizedBox(height: 35),
                                                 ElevatedButton(
                                                   onPressed: () {
-                                                    voiture.disponibilite ==
-                                                            "disponible"
-                                                        ? passage(
+                                                    passage(
                                                             voiture.prixJour,
                                                             voiture.caution,
                                                             voiture.modele,
-                                                            voiture.photo)
-                                                        : null;
+                                                            voiture.photo);
                                                   },
                                                   style: ElevatedButton.styleFrom(
                                                     foregroundColor: Colors.black, backgroundColor: Colors.red,

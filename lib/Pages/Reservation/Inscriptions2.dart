@@ -853,25 +853,22 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
                   ),
                 ),
               )
-          ),
-          Card(
+          ), Card(
             margin: EdgeInsets.symmetric(horizontal: 16),
-              shape: RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
             child: InkWell(
-            onTap: () async {
-            Image_Path = await Gallery();
-            setState(() {});
-            },
+              onTap: () async {
+                Image_Path = await Gallery();
+                setState(() {});
+              },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                  Padding(
-                  padding: EdgeInsets.only(left: 16),
-                    child:  Image_Path!=""?
+                    Image_Path!=""?
                     Expanded(
                       child: Text(
                         "Image ${getImageNameFromPath(Image_Path)}",
@@ -884,12 +881,11 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
                     IconButton(
                       icon: Icon(Icons.camera_alt),
                       onPressed: () async {
-                      Image_Path = await Camera();
-                      setState(() {});
+                        Image_Path = await Camera();
+                        setState(() {});
                       },
                     ),
                   ],
@@ -897,7 +893,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
               ),
             ),
           ),
-          SizedBox(height: 20,)
+          SizedBox(height:10,)
               ],
             ),
            ),

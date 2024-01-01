@@ -255,7 +255,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                       padding: EdgeInsets.only(left: 8.0), // Adjust the padding as needed
                       child: Icon(Icons.calendar_today),
                     ),
-                    labelText: translation(context).reservation_voiture_daterammser,
+                    labelText: translation(context).reservation_voiture_message1,
                   ),
                   readOnly: true,
                   onTap: () async {
@@ -297,7 +297,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                     padding: EdgeInsets.only(left: 8.0), // Adjust the padding as needed
                     child: Icon(Icons.calendar_today),
                   ),
-                    labelText: translation(context).reservation_voiture_daterevenir,
+                    labelText: translation(context).reservation_voiture_message2,
                 ),
                 readOnly: true,
                 onTap: () async {

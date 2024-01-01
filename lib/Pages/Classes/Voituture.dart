@@ -3,17 +3,15 @@ import 'package:neapolis_car/main.dart';
 class Voiture {
   final String numeroSeries;
   final String modele;
-  final String nbSeats;
-  final String nbBags;
-  final String nbPorts;
+  final int nbSeats;
+  final int nbBags;
+  final int nbPorts;
   final double prixJour;
   final double caution;
   final String annee;
   final String etat;
-  final String marque;
-  final String photoMarque;
   final String photo;
-  final String disponibilite; // This will be the URL of the photo
+  final int id_marquer;
   Voiture({
     required this.numeroSeries,
     required this.modele,
@@ -24,10 +22,8 @@ class Voiture {
     required this.caution,
     required this.annee,
     required this.etat,
-    required this.marque,
-    required this.photoMarque,
     required this.photo,
-    required this.disponibilite,
+    required this.id_marquer
   });
   String getPhotoUrl(String ip) {
     return ip + photo;
@@ -44,10 +40,8 @@ class Voiture {
         caution: json['caution'],
         annee: json['annee'],
         etat: json['etat'],
-        marque:json['marque'],
-        photoMarque : json['photoMarque'],
         photo: json['photo'],
-        disponibilite: json['disponibilite']
+        id_marquer : json['id_marquer']
     );
   }
 }

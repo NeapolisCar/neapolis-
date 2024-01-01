@@ -18,14 +18,10 @@ class _MyAppBarState extends State<MyAppBar> {
         backgroundColor: Colors.red[500],
         elevation: 0, // Remove the elevation/shadow
         // toolbarHeight: 220,
-        leading: Positioned(
-          top: 0,
-          left: 20,
-          child: Image.asset("assets/images/logo-neapolisV444.png",
+        leading: Image.asset("assets/images/logo-neapolisV444.png",
             width: 100,
             height: 200,
           ),
-        ),
         title: Text(widget.Title),
 
         bottom: PreferredSize(

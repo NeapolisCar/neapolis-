@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, prefer_const_constructors, no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 
+import '../Classes/Marque.dart';
+
 class ListVoitures extends StatefulWidget {
   const ListVoitures({Key? key}) : super(key: key);
 
@@ -27,6 +30,7 @@ class ListVoitures extends StatefulWidget {
 
 class _ListVoituresState extends State<ListVoitures> {
   List<Voiture> _voitures = [];
+  List<Marquer> _marquer =[];
   List<Options> _Options = [];
   int? _idlisttransfer;
   int? _idlistexurion;
@@ -53,6 +57,7 @@ class _ListVoituresState extends State<ListVoitures> {
       await Future.delayed(Duration(seconds: 1));
     }
     fetchVoitures();
+    fetchMarquer();
   }
   void Dialog(String numeroSeries, String modele, String photo) {
     bool _acceptRole = false;
@@ -257,7 +262,8 @@ class _ListVoituresState extends State<ListVoitures> {
                               Row(
                                   children: [
                                     Flexible(
-                                        child: Text(option.title)
+                                        child: Text(option.title,
+                                            style:Theme.of(context).textTheme.caption)
                                     ),
                                   ]
                               ),
@@ -270,7 +276,8 @@ class _ListVoituresState extends State<ListVoitures> {
                                     height: 23,
                                   ):
                                   Flexible(
-                                      child:Text(option.descriptions)
+                                      child:Text(option.descriptions,
+                                          style: Theme.of(context).textTheme.caption)
                                   ),
                                 ],
                               ),
@@ -336,7 +343,7 @@ class _ListVoituresState extends State<ListVoitures> {
 
   Future<void> fetchVoitures() async {
     final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Voitures1'),
+      Uri.parse('$ip/polls/AvailableCarsViewSet'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -398,6 +405,88 @@ class _ListVoituresState extends State<ListVoitures> {
     }
   }
 
+  Future<void> fetchMarquer() async {
+    final response = await http.post(
+      Uri.parse('$ip/polls/Afficher_Marque'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _marquer = jsonData.map((json) {
+                return Marquer.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+            setState(() {
+              _voitures =groupByModele(_voitures);
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
+    }
+  }
+  String nom(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.nom;
+  }
+  String logo(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.logo;
+  }
+  List<Voiture> groupByModele(List<Voiture> voitures) {
+    List<Voiture> groupedVoitures = [];
+    String modele = "";
+
+    for (Voiture item in voitures) {
+      if (modele != item.modele) {
+        modele = item.modele;
+        groupedVoitures.add(item);
+      }
+    }
+
+    return groupedVoitures;
+  }
   showSnackBar(String message){
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
@@ -509,15 +598,12 @@ class _ListVoituresState extends State<ListVoitures> {
                           .map(
                             (voiture) =>  InkWell(
                               onTap: () {
-                                voiture.disponibilite ==
-                                    "disponible"
-                                    ? Dialog(
+                                Dialog(
                                   voiture
                                       .numeroSeries,
                                   voiture.modele,
                                   voiture.photo,
-                                )
-                                    : null;
+                                );
                               },
                               child:  Center(
                           child: Stack(
@@ -547,7 +633,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                       ),
                                       SizedBox(height: 50),
                                       Text(
-                                        voiture.modele == "mercidies"
+                                        nom(voiture.id_marquer) == "Mercidies"
                                             ? (_prixtoul = _prixtoul +
                                             200)
                                             .toString() +
@@ -564,9 +650,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                         ),
                                       ),
                                       SizedBox(height: 40),
-                                      voiture.disponibilite ==
-                                          "disponible"
-                                          ? Row(
+                                     Row(
                                         children: [
                                           FaIcon(
                                             FontAwesomeIcons
@@ -578,20 +662,6 @@ class _ListVoituresState extends State<ListVoitures> {
                                           Text(AppLocalizations
                                               .of(context)!
                                               .liste_de_voitures_Disponible),
-                                        ],
-                                      )
-                                          : Row(
-                                        children: [
-                                          FaIcon(
-                                            FontAwesomeIcons
-                                                .cancel,
-                                            color: Colors.red,
-                                            size: 24,
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(AppLocalizations
-                                              .of(context)!
-                                              .liste_de_voitures_NoDisponible),
                                         ],
                                       ),
                                       TextButton(
@@ -631,10 +701,10 @@ class _ListVoituresState extends State<ListVoitures> {
                                       children: [
                                         Row(
                                           children: [
-                                            Text(voiture.marque),
+                                            Text(nom(voiture.id_marquer), style:Theme.of(context).textTheme.bodyText2),
                                             const SizedBox(width: 10,),
                                             Image.network(
-                                              voiture.photoMarque,
+                                              logo(voiture.id_marquer),
                                               width: 50,
                                               height: 50,
                                             ),
@@ -643,9 +713,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                         SizedBox(height: 5),
                                         Text(
                                           voiture.modele,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
+                                          style: Theme.of(context).textTheme.caption
                                         ),
                                         SizedBox(height: 10),
                                         Row(
@@ -659,7 +727,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                               width: 5,
                                             ),
                                             Text(
-                                                voiture.nbSeats +
+                                                voiture.nbSeats.toString() +
                                                     AppLocalizations.of(
                                                         context)!
                                                         .liste_de_voitures_SEATS,
@@ -675,7 +743,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                               width: 5,
                                             ),
                                             Text(
-                                                voiture.nbBags +
+                                                voiture.nbBags.toString() +
                                                     AppLocalizations.of(
                                                         context)!
                                                         .liste_de_voitures_BAGS,
@@ -696,7 +764,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                               width: 5,
                                             ),
                                             Text(
-                                                voiture.nbPorts +
+                                                voiture.nbPorts.toString() +
                                                     AppLocalizations.of(
                                                         context)!
                                                         .liste_de_voitures_PORTES,
@@ -708,15 +776,12 @@ class _ListVoituresState extends State<ListVoitures> {
                                         SizedBox(height: 35),
                                         ElevatedButton(
                                           onPressed: () {
-                                            voiture.disponibilite ==
-                                                "disponible"
-                                                ? Dialog(
+                                            Dialog(
                                               voiture
                                                   .numeroSeries,
                                               voiture.modele,
                                               voiture.photo,
-                                            )
-                                                : null;
+                                            );
                                           },
                                           style: ElevatedButton
                                               .styleFrom(

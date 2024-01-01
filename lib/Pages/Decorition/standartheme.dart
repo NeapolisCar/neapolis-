@@ -113,13 +113,13 @@ class themes_App{
             color:alice_blue,
             fontFamily:"Rubik"
         ),
-        // caption: TextStyle(
-        //     fontSize: 12,
-        //     fontWeight: FontWeight.w600,
-        //     letterSpacing: 0.4,
-        //     color: Colors.grey,
-        //     fontFamily:"Rubik"
-        // ),
+        caption: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
+            color: Colors.grey,
+            fontFamily:"Rubik"
+        ),
       )
 
   );

@@ -13,10 +13,10 @@
       }
     }
   },
-  "reservation_voiture_message1": "Choice la date de ramasser.",
-  "reservation_voiture_message2": "Choice  la date de revenir.",
-  "reservation_voiture_message3": "Choice  la location de ramasser ",
-  "reservation_voiture_message4": "Choice la location de revenir",
+  "reservation_voiture_message1": "Choisissez la date de ramassage",
+  "reservation_voiture_message2": "Choisissez  la date de retour",
+  "reservation_voiture_message3": "Choisissez le lieu de depart",
+  "reservation_voiture_message4": "Choisissez le lieu de retour",
   "reservation_voiture_message5": "Nous ne travaillons pas à cette heure",
   "reservation_voiture_message6": "La date de retour doit être au moins 3 jours après la date de ramasser.",
   "reservation_voiture_message7":"La date de ramasser doit être demain  ou une date future.",
@@ -25,7 +25,7 @@
   "reservation_voiture_list2": "Choice Bureau de revenir",
   "reservation_voiture_daterammser": "Choice date de rammasser",
   "reservation_voiture_daterevenir": "Choice date de revenir",
-  "reservation_voiture_button":"Suivent",
+  "reservation_voiture_button":"Suivant",
   "reservation_Transfer_message1": "Choice la date de Départ",
   "reservation_Transfer_message2": "La date de Depart doit être demain ou une date future.",
   "reservation_Transfer_type": "Choisissez type de Service",
@@ -33,7 +33,7 @@
   "reservation_Transfer_address2": "Choisissez adresse d'arrivée",
   "reservation_Transfer_value1":"Aller et retour",
   "reservation_Transfer_Excursion": "Choisissez Excursion",
-  "reservation_Transfer_date1": "Date départ",
+  "reservation_Transfer_date1": "Date de départ",
   "liste_de_voitures_title": "Liste de voitures",
   "chauffageAuxiliaire": "Chauffage auxiliaire",
   "verrouillageCentral": "Verrouillage central",
@@ -184,7 +184,7 @@
   "historique_Addressarriver":"Address d'arriver: ",
   "historique_button2": "Annuler",
   "historique_button3": "Termine",
-  "parametres_title": "Paramèters",
+  "parametres_title": "Paramètres",
   "franch": "French",
   "arabic": "Arabic",
   "english": "English",
@@ -218,5 +218,5 @@
   "tikTok": "TikTok",
   "instagram": "Instagram",
   "accueil":"Accueil",
-  "visture":"visiteur"
+  "visture":"Visiteur"
 }
