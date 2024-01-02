@@ -46,7 +46,7 @@ class _ListVoitureState extends State<ListVoiture> {
   bool loading = true;
 
   Future<void> getData() async {
-    while (_days == null || _dateRamasser == DateTime.now()) {
+    while (_days == null || _dateRamasser == DateTime.now() ) {
       await Future.delayed(const Duration(seconds: 1));
     }
     fetchVoitures();
@@ -527,7 +527,7 @@ class _ListVoitureState extends State<ListVoiture> {
                 Expanded(
                   child: SingleChildScrollView(
                     // ignore: unnecessary_null_comparison
-                    child: _voitures != null?  Column(
+                    child: (_voitures != null || _marquer!= null)?  Column(
                             children: _voitures
                                 .map(
                                   (voiture) => InkWell(
@@ -549,6 +549,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                         shadowColor: Colors.grey.withOpacity(0.3),
                                         child: Row(
                                           children: [
+                                          Expanded(
+                                          child:
                                             Column(
                                                 children: [
                                               Image.network(
@@ -574,6 +576,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                                   translation(context)
                                                       .liste_de_voitures_jours),
                                               Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
                                                         const FaIcon(
                                                           FontAwesomeIcons
@@ -584,7 +587,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                                         ),
                                                         const SizedBox(width: 5),
                                                         Text(AppLocalizations.of(context)!
-                                                            .liste_de_voitures_Disponible),
+                                                            .liste_de_voitures_Disponible,
+                                                        ),
                                                       ],
                                                     ),
                                               const SizedBox(height: 10),
@@ -613,7 +617,10 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 ),
                                               ),
                                             ]),
+                                          ),
                                             const SizedBox(width: 15.0),
+                                            Expanded(
+                                          child:
                                             Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -621,7 +628,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 Row(
                                                   children: [
                                                     Text("${nom(voiture.id_marquer)}",
-                                                        style:Theme.of(context).textTheme.bodyText2),
+                                                        style:Theme.of(context).textTheme.bodyText2,
+                                                        overflow: TextOverflow.ellipsis),
                                                     const SizedBox(width: 10,),
                                                     Image.network(
                                                       logo(voiture.id_marquer),
@@ -634,8 +642,6 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 Text(
                                                   voiture.modele,
                                                   overflow: TextOverflow.ellipsis,
-                                                  style:
-                                                      Theme.of(context).textTheme.caption
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Row(
@@ -649,12 +655,12 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbSeats.toString() +
+                                                        voiture.nbSeats.toString()+" "+
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_SEATS,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 11,
                                                         )),
                                                     Image.asset(
                                                       "assets/images/img_bags1.png",
@@ -665,12 +671,12 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbBags.toString() +
+                                                        voiture.nbBags.toString()+" " +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_BAGS,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 11,
                                                         )),
                                                   ],
                                                 ),
@@ -686,12 +692,12 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbPorts.toString() +
+                                                        voiture.nbPorts.toString()+" " +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_PORTES,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 11,
                                                         ))
                                                   ],
                                                 ),
@@ -730,6 +736,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                                   ),
                                                 ),
                                               ],
+                                            )
                                             )
                                           ],
                                         ),

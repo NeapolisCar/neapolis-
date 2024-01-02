@@ -622,6 +622,8 @@ class _ListVoituresState extends State<ListVoitures> {
                                 Colors.grey.withOpacity(0.3),
                                 child: Row(
                                   children: [
+                                Expanded(
+                                child:
                                     Column(
                                         children: [
                                       Image.network(
@@ -651,6 +653,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                       ),
                                       SizedBox(height: 40),
                                      Row(
+                                       mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           FaIcon(
                                             FontAwesomeIcons
@@ -693,8 +696,11 @@ class _ListVoituresState extends State<ListVoitures> {
                                           ),
                                         ),
                                       ),
-                                    ]),
+                                    ])
+                                ),
                                     SizedBox(width: 15.0),
+                                  Expanded(
+                                    child:
                                     Column(
                                       crossAxisAlignment:
                                       CrossAxisAlignment.start,
@@ -732,7 +738,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                                         context)!
                                                         .liste_de_voitures_SEATS,
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 11,
                                                 )),
                                             Image.asset(
                                               "assets/images/img_bags1.png",
@@ -748,7 +754,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                                         context)!
                                                         .liste_de_voitures_BAGS,
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 11,
                                                 )),
                                           ],
                                         ),
@@ -769,7 +775,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                                         context)!
                                                         .liste_de_voitures_PORTES,
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 11,
                                                 ))
                                           ],
                                         ),
@@ -816,6 +822,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                           ),
                                         ),
                                       ],
+                                    )
                                     )
                                   ],
                                 ),

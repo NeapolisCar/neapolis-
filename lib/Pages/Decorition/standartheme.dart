@@ -62,7 +62,7 @@ class themes_App{
             fontWeight: FontWeight.bold,
             letterSpacing: 0,
             color: alice_blue,
-            fontFamily:"Rubik"
+            fontFamily:"Roboto"
         ),
         headline5: TextStyle(
             fontSize: 20,
@@ -118,7 +118,7 @@ class themes_App{
             fontWeight: FontWeight.w600,
             letterSpacing: 0.4,
             color: Colors.grey,
-            fontFamily:"Rubik"
+            fontFamily:"Roboto"
         ),
       )
 
