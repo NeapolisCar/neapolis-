@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, unnecessary_null_comparison, use_key_in_widget_constructors, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_constructors, use_build_context_synchronously, unnecessary_brace_in_string_interps
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -22,7 +23,7 @@ class MyDrawer extends StatefulWidget {
 class _MyDrawerState extends State<MyDrawer> {
   late List<Client> _Client = [];
   late int id = 0;
-  late String _nomprenom = 'Visture';
+  late String _nomprenom = translation(context).visture;
   late String _image = '';
   late bool _session = false;
   var whatsappUrl = "whatsapp://send?phone=${"+21698307590"}";
@@ -48,6 +49,7 @@ class _MyDrawerState extends State<MyDrawer> {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('id')) {
       id = prefs.getInt('id')!;
+      List<Client> client = [];
       final response = await http.post(
         Uri.parse('$ip/polls/Afficher_Client'),
         headers: <String, String>{
@@ -58,18 +60,62 @@ class _MyDrawerState extends State<MyDrawer> {
         }),
       );
       if (response.statusCode == 200) {
-        final List<Client> client = jsonDecode(response.body)
-            .map<Client>((json) => Client.fromJson(json))
-            .toList();
-        setState(() {
-          _Client = client;
-          if (_Client.isNotEmpty) {
-            _nomprenom = _Client.first.nomprenom;
-            _image = _Client.first.photo;
-          }
-        });
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                  _nomprenom = _Client.first.nomprenom;
+                  _image = _Client.first.photo;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
+        }
       } else {
-        throw Exception('Failed to load notifications');
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
       }
     }
   }
@@ -145,7 +191,7 @@ class _MyDrawerState extends State<MyDrawer> {
               decoration: BoxDecoration(color: Colors.red),
               child: Column(
                 children: [
-                  _image != null
+                  _image != ""
                       ? Center(
                           child: CircleAvatar(
                             backgroundColor: Colors
@@ -166,7 +212,7 @@ class _MyDrawerState extends State<MyDrawer> {
                         )
                       : CircleAvatar(
                           backgroundImage: AssetImage(
-                            'assets/images/user.jpg',
+                            'assets/images/user.png',
                           ),
                           radius: 50,
                         ),

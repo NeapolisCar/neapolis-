@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use, non_constant_identifier_names, prefer_final_fields, no_leading_underscores_for_local_identifiers, prefer_const_constructors, sized_box_for_whitespace, prefer_interpolation_to_compose_strings
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -46,19 +47,57 @@ class _ResultaTransferState extends State<ResultaTransfer> {
   }
   Future<void> fetchDetails() async {
     if (_type == "Transfer") {
-      final response = await http.post(
-          Uri.parse("$ip/polls/AfficherListTransfer1"));
+      final response = await http.post(Uri.parse("$ip/polls/AfficherListTransfer1"));
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        setState(() {
-          _ListTransfer = jsonData.map((json) {
-            return LisTransfer.fromJson(json);
-          }).toList();
-        });
-        setState(() {
-          _address_depar= _ListTransfer.first.addressDepart;
-          _address_fin= _ListTransfer.first.addressFin;
-        });
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+          final List<dynamic> jsonData = responseData['data'];
+          setState(() {
+            _ListTransfer = jsonData.map((json) {
+              return LisTransfer.fromJson(json);
+            }).toList();
+            _address_depar = _ListTransfer.isNotEmpty ? _ListTransfer.first.addressDepart : "";
+            _address_fin = _ListTransfer.isNotEmpty ? _ListTransfer.first.addressFin : "";
+          });
+        } break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
       }
     }
     else if (_type == "Exurcion") {
@@ -67,22 +106,63 @@ class _ResultaTransferState extends State<ResultaTransfer> {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(
-            <String, dynamic>{'id': _idlistexurion}), // Send data as JSON
+        body: jsonEncode(<String, dynamic>{'id': _idlistexurion}),
       );
+
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        setState(() {
-          final listExurcion = jsonData.map((json) {
-            return ListExurcion.fromJson(json);
-          }).cast<ListExurcion>().toList();
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+          final List<dynamic> jsonData = responseData['data'];
           setState(() {
+            final listExurcion = jsonData.map((json) {
+              return ListExurcion.fromJson(json);
+            }).cast<ListExurcion>().toList();
             _ListExurcion = listExurcion;
+
+            // Assuming _ListExurcion is not empty, set _address_depar
+            if (_ListExurcion.isNotEmpty) {
+              _address_depar = _ListExurcion.first.addressDepart;
+            }
           });
-          setState(() {
-            _address_depar= _ListExurcion.first.addressDepart;
-          });
-        });
+        } break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
       }
     }
   }
@@ -174,6 +254,9 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red[900],
+                  ),
                   child: Text(translation(context).details_voiture_RAn),
                 ),
                 SizedBox(width: 20),
@@ -184,6 +267,9 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                         }
                       : null, // Désactiver le bouton Accepter si la case à cocher n'est pas cochée
                   child: Text(translation(context).details_voiture_Rbutton),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green[900],
+                  ),
                 ),
               ],
             );
@@ -345,6 +431,8 @@ class _ResultaTransferState extends State<ResultaTransfer> {
                                       _photo,
                                       width: 289,
                                       height: 133,
+                                      errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                      ),
                                     ),
                                     SizedBox(
                                       height: 20,

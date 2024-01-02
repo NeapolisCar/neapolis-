@@ -531,65 +531,77 @@ onStepTapped(int value){
     }
     var response = await request.send();
     if (response.statusCode == 200) {
-      Navigator.of(context).pop();      final prefs = await SharedPreferences.getInstance();
+      Navigator.of(context).pop();
+      final prefs = await SharedPreferences.getInstance();
       final responseData = await response.stream.bytesToString();
       final jsonData = jsonDecode(responseData);
-      final String reponse = jsonData['Reponse'].toString();
-      if (reponse == "error") {
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message11,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else if (reponse == "email déjà utilisé") {
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message13,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } else {
-
-        prefs.setInt('id', int.parse(reponse));
-        Fluttertoast.showToast(
-            msg: translation(context).inscriotion_message12,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        switch (_type) {
-          case "Reservation":
-            {
-              Navigator.pushNamed(context, 'ResultReservation', arguments: {
-                'type': _type,
-                'dateRamasser': _dateRamasser,
-                'dateRevenir': _dateRevenir,
-                'location_de_rammaser': _location_de_rammaser,
-                'location_de_revenir': _location_de_revenir,
-                'days': _days,
-                'numeroSeries': _numeroSeries,
-                'prixToutal': _prixToutal,
-                'modele': _modele,
-                'prixJour': _prixJour,
-                'prix': _prix,
-                'caution': _caution,
-                'photo': _photo,
-                'PLEIN ESSENCE': _PLEIN_SSENCE,
-                'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
-                'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
-                'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
-                'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
-              });
+      switch (jsonData['Reponse']) {
+        case "Success":
+          {
+            final int id = jsonData['id'];
+            prefs.setInt('id', id);
+            switch (_type) {
+              case "Reservation":
+                {
+                  Navigator.pushNamed(context, 'ResultReservation', arguments: {
+                    'type': _type,
+                    'dateRamasser': _dateRamasser,
+                    'dateRevenir': _dateRevenir,
+                    'location_de_rammaser': _location_de_rammaser,
+                    'location_de_revenir': _location_de_revenir,
+                    'days': _days,
+                    'numeroSeries': _numeroSeries,
+                    'prixToutal': _prixToutal,
+                    'modele': _modele,
+                    'prixJour': _prixJour,
+                    'prix': _prix,
+                    'caution': _caution,
+                    'photo': _photo,
+                    'PLEIN ESSENCE': _PLEIN_SSENCE,
+                    'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
+                    'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
+                    'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
+                    'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
+                  });
+                }
+                break;
             }
-            break;
-        }
+          }
+          break;
+        case "email déjà utilisé":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message13,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 200,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 200,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 200,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
       }
     } else {
       Navigator.of(context).pop();
@@ -597,7 +609,7 @@ onStepTapped(int value){
           msg: translation(context).inscriotion_message10,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
+          timeInSecForIosWeb: 200,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);

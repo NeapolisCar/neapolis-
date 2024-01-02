@@ -19,6 +19,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _mot_de_passe = TextEditingController();
+  bool password =false;
+  bool _email1 = false;
   bool _DEUXIEME_CONDUCTEUR = false;
   bool _REHAUSSEUR = false;
   bool _SYSTEME_DE_NAVIGATION_GPS = false;
@@ -38,32 +40,64 @@ class _LoginState extends State<Login> {
   String _photo = "";
   String _type = "";
   bool value1 = false;
+  bool isValidEmail(String email) {
+    final emailRegExp = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
 
+    return emailRegExp.hasMatch(email);
+  }
   void Logins(String email, String mot_de_passe, BuildContext context) async {
-    showDialog(
-        context: context,
-        builder: (context){
-          return Center(child:CircularProgressIndicator());
-        }
-    );
+    if (!isValidEmail(_email.text)) {
+      setState(() {
+        _email1= true;
+      });
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message2,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else if (_mot_de_passe.text.isEmpty){
+      setState(() {
+        password= true;
+      });
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message3,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+    else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return Center(child: CircularProgressIndicator());
+          }
+      );
 
-    final response = await http.post(
-      Uri.parse('$ip/polls/Verification'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'mot_de_passe': mot_de_passe,
-      }),
-    );
-    if (response.statusCode == 200) {
-      Navigator.of(context).pop();
-      final prefs = await SharedPreferences.getInstance();
-      final responseData = jsonDecode(response.body);
-      if (responseData.containsKey('Reponse')) {
-        final int id = responseData['Reponse'];
-        prefs.setInt('id', id);
+      final response = await http.post(
+        Uri.parse('$ip/polls/Verification'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'email': email,
+          'mot_de_passe': mot_de_passe,
+        }),
+      );
+      if (response.statusCode == 200) {
+        Navigator.of(context).pop();
+        final prefs = await SharedPreferences.getInstance();
+        final responseData = jsonDecode(response.body);
+        switch (responseData['Response'].toString()) {
+          case "Activated":
+            {
+              final int id = responseData['id'];
+              prefs.setInt('id', id);
               Navigator.pushNamed(context, 'ResultReservation', arguments: {
                 'type': _type,
                 'dateRamasser': _dateRamasser,
@@ -84,9 +118,63 @@ class _LoginState extends State<Login> {
                 'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
                 'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
               });
-      } else {
+            }
+            break;
+          case "Deactivated":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).login_message2,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 200,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Password Incorrect":
+            {
+              setState(() {
+                password = true;
+              });
+              Fluttertoast.showToast(
+                  msg: translation(context).login_message1,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 200,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).login_message3,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 200,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 200,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+        }
+      }
+      else {
         Fluttertoast.showToast(
-            msg: translation(context).login_message1,
+            msg: translation(context).inscriotion_message11,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
@@ -94,8 +182,6 @@ class _LoginState extends State<Login> {
             textColor: Colors.white,
             fontSize: 16.0);
       }
-    } else {
-      throw Exception('Failed to Login');
     }
   }
 
@@ -153,7 +239,7 @@ class _LoginState extends State<Login> {
           _SIEGE_BEBE = arguments['SIÈGE BÉBÉ ( 6-24 MOIS)'] as bool;
     return  WillPopScope(
         onWillPop: () async {
-      Navigator.pushNamed(context, 'inscriptions', arguments: {
+      Navigator.pushNamed(context, 'detailVoiture', arguments: {
         'type':_type,
         'dateRamasser':_dateRamasser,
         'dateRevenir':_dateRevenir,
@@ -229,6 +315,7 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       prefixIcon: Icon(Icons.person),
+                      errorText: _email1 ? translation(context).inscriotion_message2 : null,
                     ),
                   ),
                   SizedBox(height: 10.0),
@@ -241,6 +328,7 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       prefixIcon: Icon(Icons.key),
+                      errorText: password ? translation(context).login_message1 : null,
                     ),
                   ),
                   SizedBox(height: 10.0),

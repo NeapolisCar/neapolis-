@@ -24,6 +24,8 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
   String _modele = "";
   String _photo = "";
   String _type = "";
+  bool _email1= false;
+  bool password = false;
   int? _idlisttransfer;
   int? _idlistexurion;
   bool _allez_retour = false;
@@ -32,63 +34,152 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
   String _nb_place = "";
   String _nb_bagage = "";
   bool value1 = false;
+  bool isValidEmail(String email) {
+    final emailRegExp = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
 
+    return emailRegExp.hasMatch(email);
+  }
   void Logins(String email, String mot_de_passe, BuildContext context) async {
-    final response = await http.post(
-      Uri.parse('$ip/polls/Verification'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'mot_de_passe': mot_de_passe,
-      }),
-    );
+    if (!isValidEmail(_email.text)) {
+      setState(() {
+        _email1= true;
+      });
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message2,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else if (_mot_de_passe.text.isEmpty){
+      setState(() {
+        password= true;
+      });
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message3,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+    else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return Center(child: CircularProgressIndicator());
+          }
+      );
+      final response = await http.post(
+        Uri.parse('$ip/polls/Verification'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'email': email,
+          'mot_de_passe': mot_de_passe,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final prefs = await SharedPreferences.getInstance();
-      final responseData = jsonDecode(response.body);
-      if (responseData.containsKey('Reponse')) {
-        final int id = responseData['Reponse'];
-        prefs.setInt('id', id);
-        switch (_type) {
-          case "Transfer":
+      if (response.statusCode == 200) {
+        Navigator.of(context).pop();
+        final prefs = await SharedPreferences.getInstance();
+        final responseData = jsonDecode(response.body);
+        switch (responseData['Response']) {
+          case "Activated":
             {
-              Navigator.pushNamed(context, 'ResultTransfer', arguments: {
-                'type': _type,
-                'dateRamasser': _dateRamasser,
-                'idlisttransfer': _idlisttransfer,
-                'allez_retour': _allez_retour,
-                'prixTransfer': _prixtoul,
-                'SIÈGE BÉBÉ': _siege_bebe,
-                'Nombre de place': _nb_place,
-                'Nombre de bagages': _nb_bagage,
-                'numeroSeries': _numeroSeries,
-                'modele': _modele,
-                'photo': _photo,
-              });
+              final int id = responseData['id'];
+              prefs.setInt('id', id);
+              switch (_type) {
+                case "Transfer":
+                  {
+                    Navigator.pushNamed(context, 'ResultTransfer', arguments: {
+                      'type': _type,
+                      'dateRamasser': _dateRamasser,
+                      'idlisttransfer': _idlisttransfer,
+                      'allez_retour': _allez_retour,
+                      'prixTransfer': _prixtoul,
+                      'SIÈGE BÉBÉ': _siege_bebe,
+                      'Nombre de place': _nb_place,
+                      'Nombre de bagages': _nb_bagage,
+                      'numeroSeries': _numeroSeries,
+                      'modele': _modele,
+                      'photo': _photo,
+                    });
+                  }
+                  break;
+                case "Exurcion":
+                  {
+                    Navigator.pushNamed(context, 'ResultTransfer', arguments: {
+                      'type': _type,
+                      'dateRamasser': _dateRamasser,
+                      'idlistexurion': _idlistexurion,
+                      'prixTransfer': _prixtoul,
+                      'SIÈGE BÉBÉ': _siege_bebe,
+                      'Nombre de place': _nb_place,
+                      'Nombre de bagages': _nb_bagage,
+                      'numeroSeries': _numeroSeries,
+                      'modele': _modele,
+                      'photo': _photo,
+                    });
+                  }
+                  break;
+              }
             }
             break;
-          case "Exurcion":
+          case "Deactivated":
             {
-              Navigator.pushNamed(context, 'ResultTransfer', arguments: {
-                'type': _type,
-                'dateRamasser': _dateRamasser,
-                'idlistexurion': _idlistexurion,
-                'prixTransfer': _prixtoul,
-                'SIÈGE BÉBÉ': _siege_bebe,
-                'Nombre de place': _nb_place,
-                'Nombre de bagages': _nb_bagage,
-                'numeroSeries': _numeroSeries,
-                'modele': _modele,
-                'photo': _photo,
-              });
+              Fluttertoast.showToast(
+                  msg: translation(context).login_message2,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
             }
             break;
+          case "Password Incorrect":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).login_message1,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).login_message3,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
         }
       } else {
         Fluttertoast.showToast(
-            msg: translation(context).login_message1,
+            msg: translation(context).inscriotion_message11,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
@@ -96,8 +187,6 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
             textColor: Colors.white,
             fontSize: 16.0);
       }
-    } else {
-      throw Exception('Failed to Login');
     }
   }
 
@@ -276,6 +365,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       prefixIcon: Icon(Icons.person),
+                      errorText: _email1 ? translation(context).inscriotion_message2 : null,
                     ),
                   ),
                   SizedBox(height: 10.0),
@@ -288,6 +378,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       prefixIcon: Icon(Icons.key),
+                      errorText: password ? translation(context).inscriotion_message3 : null,
                     ),
                   ),
                   SizedBox(height: 10.0),
@@ -334,7 +425,6 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
                     },
                     style: ElevatedButton.styleFrom(
                       // primary: Colors.blue[700],
-
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ), // Background color

@@ -99,17 +99,56 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
           );
           if (response.statusCode == 200) {
             var responseData = json.decode(response.body);
-            final id_demande = responseData['reponse'];
+            switch(responseData['Reponse']){
+              case "Success":
+                {
+                  final id_demande = responseData['id'];
+                  Fluttertoast.showToast(
+                      msg: translation(context).web_Paiemnet_message1,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  Paiement(id_demande);
+                }
+                break;
+              case "error":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+                break;
+              case "Faild":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+            }
+          }else{
             Fluttertoast.showToast(
-                msg: translation(context).web_Paiemnet_message1,
+                msg: translation(context).inscriotion_message11,
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.TOP,
                 timeInSecForIosWeb: 1,
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.red,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Paiement(id_demande);
           }
+
         }
         break;
       case "Transfer":
@@ -124,7 +163,7 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
               'type': _type,
               'etat': "en cour",
               'date_de_depart': _dateRamasser.toString(),
-              'idlisttransfer':_idlisttransfer,
+              'idlisttransfer': _idlisttransfer,
               'allez_retour': _allez_retour,
               // 'prixTransfer': _prixtoul,
               'SIÈGE BÉBÉ': _siege_bebe,
@@ -133,29 +172,59 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
           );
           if (response.statusCode == 200) {
             var responseData = json.decode(response.body);
-            final id_demande = responseData['reponse'];
+            switch(responseData['Reponse']){
+              case "Success":
+                {
+                  final id_demande = responseData['id'];
+                  Fluttertoast.showToast(
+                      msg: translation(context).web_Paiemnet_message1,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  Paiement(id_demande);
+                }
+                break;
+              case "error":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+                break;
+              case "Faild":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+            }
+          }else{
             Fluttertoast.showToast(
-                msg: translation(context).web_Paiemnet_message1,
+                msg: translation(context).inscriotion_message11,
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.TOP,
                 timeInSecForIosWeb: 1,
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.red,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Paiement(id_demande);
           }
         }
         break;
       case "Exurcion":
         {
-          Fluttertoast.showToast(
-              msg: _numeroSeries,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.TOP,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0);
           final response = await http.post(
             Uri.parse('$ip/polls/Insert_exurcion'),
             headers: <String, String>{
@@ -166,41 +235,72 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
               'type': _type,
               'etat': "en cour",
               'date_de_depart': _dateRamasser.toString(),
-              'idlistexurion':_idlistexurion,
+              'idlistexurion': _idlistexurion,
               'SIÈGE BÉBÉ': _siege_bebe,
               'numeroSeries': _numeroSeries,
             }),
           );
           if (response.statusCode == 200) {
             var responseData = json.decode(response.body);
-            final id_demande = responseData['reponse'];
+            switch(responseData['Reponse']){
+              case "Success":
+                {
+                  final id_demande = responseData['id'];
+                  Fluttertoast.showToast(
+                      msg: translation(context).web_Paiemnet_message1,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  Paiement(id_demande);
+                }
+                break;
+              case "error":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+                break;
+              case "Faild":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+            }
+          }else
+          {
             Fluttertoast.showToast(
-                msg: translation(context).web_Paiemnet_message1,
+                msg: translation(context).inscriotion_message11,
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.TOP,
                 timeInSecForIosWeb: 1,
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.red,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Paiement(id_demande);
           }
-          Fluttertoast.showToast(
-              msg: translation(context).inscriotion_message11,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.TOP,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: 16.0);
         }
     }
   }
 
   verify(String url) async {
-    if (url == "https://dev.konnect.network/gateway/payment-failure?payment_ref=" +
+    if (url == "https://dev.konnect.network/gateway/payment-success?payment_ref=" +
             _paymentRef) {
       final response = await http.get(
-        Uri.parse('https://api.preprod.konnect.network/api/v2/payments/' +
+        Uri.parse('https://api.konnect.network/api/v2/payments/:' +
             _paymentRef),
       );
       switch (response.statusCode) {
@@ -307,6 +407,14 @@ class _WebViewPaimentState extends State<WebViewPaiment> {
           }
           break;
       }
+    }
+    else if (url == "https://dev.konnect.network/gateway/payment-failure?payment_ref" +
+        _paymentRef){
+      final response = await http.get(
+        Uri.parse('https://api.konnect.network/api/v2/payments/:paymentId' +
+            _paymentRef),
+      );
+      controller.loadUrl(_url);
     }
   }
   void clickButton() async {

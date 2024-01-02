@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -45,17 +46,61 @@ class _UserNavBarState extends State<UserNavBar> {
         }),
       );
       if (response.statusCode == 200) {
-        final List<Client> client = jsonDecode(response.body)
-            .map<Client>((json) => Client.fromJson(json))
-            .toList();
-        setState(() {
-          _Client = client;
-          if (_Client.isNotEmpty) {
-            _nomprenom = _Client.first.nomprenom;
-          }
-        });
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                  _nomprenom = _Client.first.nomprenom;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
+        }
       } else {
-        throw Exception('Failed to load notifications');
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
       }
     }
   }

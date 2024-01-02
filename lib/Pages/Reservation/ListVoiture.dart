@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:neapolis_car/Pages/Classes/Marque.dart';
 import 'package:neapolis_car/Pages/Compounes/dropitem.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'package:neapolis_car/Pages/Navigation_components/MyDrawer.dart';
@@ -25,13 +26,13 @@ class ListVoiture extends StatefulWidget {
 
 class _ListVoitureState extends State<ListVoiture> {
   List<Voiture> _voitures = [];
+  List<Marquer> _marquer =[];
   // ignore: non_constant_identifier_names
   List<Options> _Options = [];
   late String dropdownvalue = "prix_decroissant";
   final List<String> _items = [
     "prix_decroissant",
     "prix_croissant",
-    "Marque",
   ];
   final _selectedIndex = 0;
   DateTime _dateRamasser = DateTime.now();
@@ -42,12 +43,14 @@ class _ListVoitureState extends State<ListVoiture> {
   double _prix = 0;
   String _type = "";
   bool isInternet = false;
+  bool loading = true;
 
   Future<void> getData() async {
-    while (_days == null || _dateRamasser == DateTime.now()) {
+    while (_days == null || _dateRamasser == DateTime.now() ) {
       await Future.delayed(const Duration(seconds: 1));
     }
     fetchVoitures();
+    fetchMarquer();
   }
 
   Future<void> Information(
@@ -62,68 +65,102 @@ class _ListVoitureState extends State<ListVoiture> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _Options = jsonData.map((json) {
-          return Options.fromJson(json);
-        }).toList();
-      });
-      return showModalBottomSheet(
-          context: context,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-          builder: (context) => Card(
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _Options = jsonData.map((json) {
+                return Options.fromJson(json);
+              }).toList();
+            });
+            return showModalBottomSheet(
+              context: context,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
-              ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(model),
-                        Image.network(
-                          photo,
-                          width: 152,
-                          height: 99,
-                        ),
-                        // Add spacing between the TableRows
-                        Table(
-                          children: _Options.map((option) => TableRow(
-                            children: [
-                              Row(
-                                  children: [
-                          Flexible(
-                                   child: Text(option.title)
-                              ),
-                                  ]
-                              ),
-                              const SizedBox(height: 10,),
-                              Row(
-                                children: [
-                                  option.descriptions=="true"? SvgPicture.asset(
-                                    "assets/images/img_checkmark.svg",
-                                    width: 38,
-                                    height: 23,
-                                  ):
-                                  Flexible(
-                                    child:Text(option.descriptions)
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10,),
-                            ],
-                          ),
-
-                          ).toList(),
-                        ),
-                      ],
-                    ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+              builder: (context) => Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
                   ),
-                )
-                ),
-              );
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(model),
+                          Image.network(
+                            photo,
+                            width: 152,
+                            height: 99,
+                          ),
+                          // Add spacing between the TableRows
+                          Table(
+                            children: _Options.map((option) => TableRow(
+                              children: [
+                                Row(
+                                    children: [
+                                      Flexible(
+                                          child: Text(option.title,
+                                              style:Theme.of(context).textTheme.bodyText2)
+                                      ),
+                                    ]
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    option.descriptions=="true"? SvgPicture.asset(
+                                      "assets/images/img_checkmark.svg",
+                                      width: 38,
+                                      height: 23,
+                                    ):
+                                    Flexible(
+                                        child:Text(option.descriptions,
+                                            style:Theme.of(context).textTheme.bodyText2)
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                              ],
+                            ),
+
+                            ).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+
+              ),
+            );
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -133,13 +170,12 @@ class _ListVoitureState extends State<ListVoiture> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-      throw Exception('Failed to load Options');
+      throw Exception('Failed to load data from the API');
     }
   }
-
   Future<void> fetchVoitures() async {
     final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Voitures'),
+      Uri.parse('$ip/polls/AvailableCarsViewSet'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -150,12 +186,47 @@ class _ListVoitureState extends State<ListVoiture> {
       ),
     );
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _voitures = jsonData.map((json) {
-          return Voiture.fromJson(json);
-        }).toList();
-      });
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _voitures = jsonData.map((json) {
+                return Voiture.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+            setState(() {
+              _voitures =groupByModele(_voitures);
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -165,7 +236,66 @@ class _ListVoitureState extends State<ListVoiture> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-      throw Exception('Failed to load voitures');
+      throw Exception('Failed to load data from the API');
+    }
+  }
+
+  Future<void> fetchMarquer() async {
+    final response = await http.post(
+      Uri.parse('$ip/polls/Afficher_Marque'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _marquer = jsonData.map((json) {
+                return Marquer.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -183,40 +313,68 @@ class _ListVoitureState extends State<ListVoiture> {
       ),
     );
     if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      if(jsonData.containsKey('numerSeries'))
-      {
-          final String numeroSeries  = jsonData['numerSeries'];
-          final prixToutal = prixJour * _days!;
-          Navigator.pushNamed(context, 'detailVoiture', arguments: {
-              'type': _type,
-              'dateRamasser': _dateRamasser,
-              'dateRevenir': _dateRevenir,
-              'location_de_rammaser': _location_de_rammaser,
-              'location_de_revenir': _location_de_revenir,
-              'days': _days,
-              'numeroSeries': numeroSeries,
-              'prixToutal': prixToutal + _prix,
-              'caution': caution,
-              'prixJour': prixJour,
-              'prix': _prix,
-              'modele': modele,
-              'photo': photo,
-              'index': 0
-          });
-      } else {
-      Fluttertoast.showToast(
-        msg: translation(context).inscriotion_message11,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
-        }
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+              final String numeroSeries  = responseData['numerSeries'];
+              final prixToutal = prixJour * _days!;
+              Navigator.pushNamed(context, 'detailVoiture', arguments: {
+                'type': _type,
+                'dateRamasser': _dateRamasser,
+                'dateRevenir': _dateRevenir,
+                'location_de_rammaser': _location_de_rammaser,
+                'location_de_revenir': _location_de_revenir,
+                'days': _days,
+                'numeroSeries': numeroSeries,
+                'prixToutal': prixToutal + _prix,
+                'caution': caution,
+                'prixJour': prixJour,
+                'prix': _prix,
+                'modele': modele,
+                'photo': photo,
+                'index': 0
+              });
+            } break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
-          // ignore: use_build_context_synchronously
           msg: translation(context).inscriotion_message11,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
@@ -224,10 +382,32 @@ class _ListVoitureState extends State<ListVoiture> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
 
   }
 
+  String nom(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.nom;
+  }
+  String logo(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.logo;
+  }
+  List<Voiture> groupByModele(List<Voiture> voitures) {
+    List<Voiture> groupedVoitures = [];
+    String modele = "";
+
+    for (Voiture item in voitures) {
+      if (modele != item.modele) {
+        modele = item.modele;
+        groupedVoitures.add(item);
+      }
+    }
+
+    return groupedVoitures;
+  }
   void sortVoituresByPrice() {
     _voitures.sort((a, b) => a.prixJour.compareTo(b.prixJour));
   }
@@ -315,7 +495,7 @@ class _ListVoitureState extends State<ListVoiture> {
                       },
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        hintText: 'Recharche',
+                        hintText: translation(context).liste_de_voitures_recharche,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
@@ -347,20 +527,16 @@ class _ListVoitureState extends State<ListVoiture> {
                 Expanded(
                   child: SingleChildScrollView(
                     // ignore: unnecessary_null_comparison
-                    child: _voitures != null
-                        ? Column(
+                    child: (_voitures != null || _marquer!= null)?  Column(
                             children: _voitures
                                 .map(
                                   (voiture) => InkWell(
                                       onTap: () {
-                                        voiture.disponibilite ==
-                                            "disponible"
-                                            ? passage(
+                                        passage(
                                             voiture.prixJour,
                                             voiture.caution,
                                             voiture.modele,
-                                            voiture.photo)
-                                            : null;
+                                            voiture.photo);
                                       },
                                       child:  Card(
                                         margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -373,12 +549,16 @@ class _ListVoitureState extends State<ListVoiture> {
                                         shadowColor: Colors.grey.withOpacity(0.3),
                                         child: Row(
                                           children: [
+                                          Expanded(
+                                          child:
                                             Column(
                                                 children: [
                                               Image.network(
                                                 voiture.photo,
                                                 width: 152,
                                                 height: 99,
+                                                errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                                ),
                                               ),
                                               const SizedBox(height: 50),
                                               Text(
@@ -395,8 +575,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                               Text(_days.toString() +
                                                   translation(context)
                                                       .liste_de_voitures_jours),
-                                              voiture.disponibilite == "disponible"
-                                                  ? Row(
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
                                                         const FaIcon(
                                                           FontAwesomeIcons
@@ -407,21 +587,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                                         ),
                                                         const SizedBox(width: 5),
                                                         Text(AppLocalizations.of(context)!
-                                                            .liste_de_voitures_Disponible),
-                                                      ],
-                                                    )
-                                                  : Row(
-                                                      children: [
-                                                        const FaIcon(
-                                                          // ignore: deprecated_member_use
-                                                          FontAwesomeIcons.cancel,
-                                                          color: Colors.red,
-                                                          size: 24,
+                                                            .liste_de_voitures_Disponible,
                                                         ),
-                                                        const SizedBox(width: 5),
-                                                        Text(AppLocalizations.of(
-                                                                context)!
-                                                            .liste_de_voitures_NoDisponible),
                                                       ],
                                                     ),
                                               const SizedBox(height: 10),
@@ -450,17 +617,22 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 ),
                                               ),
                                             ]),
+                                          ),
                                             const SizedBox(width: 15.0),
+                                            Expanded(
+                                          child:
                                             Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   children: [
-                                                    Text(voiture.marque),
+                                                    Text("${nom(voiture.id_marquer)}",
+                                                        style:Theme.of(context).textTheme.bodyText2,
+                                                        overflow: TextOverflow.ellipsis),
                                                     const SizedBox(width: 10,),
                                                     Image.network(
-                                                      voiture.photoMarque,
+                                                      logo(voiture.id_marquer),
                                                       width: 50,
                                                       height: 50,
                                                     ),
@@ -469,9 +641,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 const SizedBox(height: 5),
                                                 Text(
                                                   voiture.modele,
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Row(
@@ -485,12 +655,12 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbSeats +
+                                                        voiture.nbSeats.toString()+" "+
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_SEATS,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 11,
                                                         )),
                                                     Image.asset(
                                                       "assets/images/img_bags1.png",
@@ -501,12 +671,12 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbBags +
+                                                        voiture.nbBags.toString()+" " +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_BAGS,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 11,
                                                         )),
                                                   ],
                                                 ),
@@ -522,26 +692,23 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       width: 5,
                                                     ),
                                                     Text(
-                                                        voiture.nbPorts +
+                                                        voiture.nbPorts.toString()+" " +
                                                             AppLocalizations.of(
                                                                     context)!
                                                                 .liste_de_voitures_PORTES,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 11,
                                                         ))
                                                   ],
                                                 ),
                                                 const SizedBox(height: 35),
                                                 ElevatedButton(
                                                   onPressed: () {
-                                                    voiture.disponibilite ==
-                                                            "disponible"
-                                                        ? passage(
+                                                    passage(
                                                             voiture.prixJour,
                                                             voiture.caution,
                                                             voiture.modele,
-                                                            voiture.photo)
-                                                        : null;
+                                                            voiture.photo);
                                                   },
                                                   style: ElevatedButton.styleFrom(
                                                     foregroundColor: Colors.black, backgroundColor: Colors.red,
@@ -570,15 +737,13 @@ class _ListVoitureState extends State<ListVoiture> {
                                                 ),
                                               ],
                                             )
+                                            )
                                           ],
                                         ),
                                       ),
                                   )
                             ).toList(),
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                          ) :Center(child: Text(translation(context).liste_de_voitures_message1)),
                   ),
                 ),
               ],

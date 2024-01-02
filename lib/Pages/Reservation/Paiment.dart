@@ -55,28 +55,75 @@ class _PiamentState extends State<Piament> {
   final Uri phoneNumber = Uri.parse('tel:+21698307590');
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
-    id = prefs.getInt('id')!;
-    final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Client'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, int>{
-        'id': id,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<Client> client = jsonDecode(response.body)
-          .map<Client>((json) => Client.fromJson(json))
-          .toList();
-      setState(() {
-        _Client = client;
-        if (_Client.isNotEmpty) {
-          _nomprenom = _Client.first.nomprenom;
+    if (prefs.containsKey('id')) {
+      id = prefs.getInt('id')!;
+      List<Client> client = [];
+      final response = await http.post(
+        Uri.parse('$ip/polls/Afficher_Client'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, int>{
+          'id': id,
+        }),
+      );
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                  _nomprenom = _Client.first.nomprenom;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
-      });
-    } else {
-      throw Exception('Failed to load Client');
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
+      }
     }
   }
 
@@ -95,85 +142,106 @@ class _PiamentState extends State<Piament> {
         'description': "paiment de $_type",
       }),
     );
-    final progressDialog = ProgressDialog(
-      context: context,
-
-      // DiagnosticsNode.message(translation(context).paiement_message1)
-    );
-    progressDialog.show();
     if (response.statusCode == 200) {
       var responseData = json.decode(response.body);
-      final url = responseData['payUrl'];
-      final paymentRef = responseData['paymentRef'];
-      progressDialog.close();
-      switch (_type) {
-        case "Reservation":
+      switch (responseData['Reponse']){
+        case "Success":
           {
-            Navigator.pushNamed(context, 'WebViewPaiment', arguments: {
-              'paymentRef': paymentRef,
-              'url': url,
-              'type': _type,
-              'dateRamasser': _dateRamasser,
-              'dateRevenir': _dateRevenir,
-              'location_de_rammaser': _location_de_rammaser,
-              'location_de_revenir': _location_de_revenir,
-              'days': _days,
-              'caution': _caution,
-              'prix':_prix,
-              'numeroSeries': _numeroSeries,
-              'prixToutal': _prixToutal,
-              'modele': _modele,
-              'prixJour': _prixJour,
-              'photo': _photo,
-              'PLEIN ESSENCE': _PLEIN_SSENCE,
-              'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
-              'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
-              'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
-              'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
-            });
-          }
-          break;
+            final data = responseData['data'];
+            final url = data['payUrl'];
+            final paymentRef = data['paymentRef'];
+            switch (_type) {
+              case "Reservation":
+                {
+                  Navigator.pushNamed(context, 'WebViewPaiment', arguments: {
+                    'paymentRef': paymentRef,
+                    'url': url,
+                    'type': _type,
+                    'dateRamasser': _dateRamasser,
+                    'dateRevenir': _dateRevenir,
+                    'location_de_rammaser': _location_de_rammaser,
+                    'location_de_revenir': _location_de_revenir,
+                    'days': _days,
+                    'caution': _caution,
+                    'prix':_prix,
+                    'numeroSeries': _numeroSeries,
+                    'prixToutal': _prixToutal,
+                    'modele': _modele,
+                    'prixJour': _prixJour,
+                    'photo': _photo,
+                    'PLEIN ESSENCE': _PLEIN_SSENCE,
+                    'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
+                    'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,
+                    'SYSTÈME DE NAVIGATION GPS': _SYSTEME_DE_NAVIGATION_GPS,
+                    'SIÈGE BÉBÉ ( 6-24 MOIS)': _SIEGE_BEBE,
+                  });
+                }
+                break;
 
-        case "Transfer":
-          {
-            Navigator.pushNamed(context, 'WebViewPaiment', arguments: {
-              'type': _type,
-              'dateRamasser': _dateRamasser,
-              'idlisttransfer': _idlisttransfer,
-              'allez_retour': _allez_retour,
-              'prixTransfer': _prixtoul,
-              'SIÈGE BÉBÉ': _siege_bebe,
-              'Nombre de place': _nb_place,
-              'Nombre de bagages': _nb_bagage,
-              'numeroSeries': _numeroSeries,
-              'modele': _modele,
-              'photo': _photo,
-              'url': url,
-              'paymentRef': paymentRef,
-            });
+              case "Transfer":
+                {
+                  Navigator.pushNamed(context, 'WebViewPaiment', arguments: {
+                    'type': _type,
+                    'dateRamasser': _dateRamasser,
+                    'idlisttransfer': _idlisttransfer,
+                    'allez_retour': _allez_retour,
+                    'prixTransfer': _prixtoul,
+                    'SIÈGE BÉBÉ': _siege_bebe,
+                    'Nombre de place': _nb_place,
+                    'Nombre de bagages': _nb_bagage,
+                    'numeroSeries': _numeroSeries,
+                    'modele': _modele,
+                    'photo': _photo,
+                    'url': url,
+                    'paymentRef': paymentRef,
+                  });
+                }
+                break;
+              case "Exurcion":
+                {
+                  Navigator.pushNamed(context, 'WebViewPaiment', arguments: {
+                    'type': _type,
+                    'dateRamasser': _dateRamasser,
+                    'idlistexurion': _idlistexurion,
+                    'prixTransfer': _prixtoul,
+                    'SIÈGE BÉBÉ': _siege_bebe,
+                    'Nombre de place': _nb_place,
+                    'Nombre de bagages': _nb_bagage,
+                    'numeroSeries': _numeroSeries,
+                    'modele': _modele,
+                    'photo': _photo,
+                    'url': url,
+                    'paymentRef': paymentRef,
+                  });
+                }
+                break;
+            }
           }
           break;
-        case "Exurcion":
+        case "error":
           {
-            Navigator.pushNamed(context, 'WebViewPaiment', arguments: {
-              'type': _type,
-              'dateRamasser': _dateRamasser,
-              'idlistexurion': _idlistexurion,
-              'prixTransfer': _prixtoul,
-              'SIÈGE BÉBÉ': _siege_bebe,
-              'Nombre de place': _nb_place,
-              'Nombre de bagages': _nb_bagage,
-              'numeroSeries': _numeroSeries,
-              'modele': _modele,
-              'photo': _photo,
-              'url': url,
-              'paymentRef': paymentRef,
-            });
+            Fluttertoast.showToast(
+                msg: translation(context).paiement_message2,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 10,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
           }
-          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 10,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
       }
     } else {
-      progressDialog.close();
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
           toastLength: Toast.LENGTH_SHORT,
@@ -202,7 +270,47 @@ class _PiamentState extends State<Piament> {
     );
 
     if (response.statusCode == 200) {
-      Navigator.pushNamed(context, 'Remerciements');
+      var responseData = json.decode(response.body);
+      switch(responseData['Reponse']){
+        case "Success":
+        {
+          Navigator.pushNamed(context, 'Remerciements');
+        }
+        break;
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+      }
+    }
+    else{
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -235,18 +343,56 @@ class _PiamentState extends State<Piament> {
           );
           if (response.statusCode == 200) {
             var responseData = json.decode(response.body);
-            final id_demande = responseData['reponse'];
+            switch(responseData['Reponse']){
+              case "Success":
+                {
+                  final id_demande = responseData['id'];
+                  Fluttertoast.showToast(
+                      msg: translation(context).web_Paiemnet_message1,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  Paiement_cash(id_demande);
+                }
+                break;
+              case "error":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+                break;
+              case "Faild":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+            }
+          }else{
             Fluttertoast.showToast(
-                msg: "Votre demade est passe secc",
+                msg: translation(context).inscriotion_message11,
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.TOP,
                 timeInSecForIosWeb: 1,
                 backgroundColor: Colors.red,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Paiement_cash(id_demande);
-            Navigator.pushNamed(context, 'Remerciements');
           }
+
         }
         break;
       case "Transfer":
@@ -270,17 +416,54 @@ class _PiamentState extends State<Piament> {
           );
           if (response.statusCode == 200) {
             var responseData = json.decode(response.body);
-            final id_demande = responseData['reponse'];
+            switch(responseData['Reponse']){
+              case "Success":
+                {
+                  final id_demande = responseData['id'];
+                  Fluttertoast.showToast(
+                      msg: translation(context).web_Paiemnet_message1,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  Paiement_cash(id_demande);
+                }
+                break;
+              case "error":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+                break;
+              case "Faild":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+            }
+          }else{
             Fluttertoast.showToast(
-                msg: "Secc",
+                msg: translation(context).inscriotion_message11,
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.TOP,
                 timeInSecForIosWeb: 1,
                 backgroundColor: Colors.red,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Paiement_cash(id_demande);
-            Navigator.pushNamed(context, 'Remerciements');
           }
         }
         break;
@@ -303,18 +486,56 @@ class _PiamentState extends State<Piament> {
           );
           if (response.statusCode == 200) {
             var responseData = json.decode(response.body);
-            final id_demande = responseData['reponse'];
-            Fluttertoast.showToast(
-                msg: "Secc",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.TOP,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0);
-            Paiement_cash(id_demande);
-            Navigator.pushNamed(context, 'Remerciements');
-          }
+            switch(responseData['Reponse']){
+              case "Success":
+                {
+                  final id_demande = responseData['id'];
+                  Fluttertoast.showToast(
+                      msg: translation(context).web_Paiemnet_message1,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  Paiement_cash(id_demande);
+                }
+                break;
+              case "error":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+                break;
+              case "Faild":
+                {
+                  Fluttertoast.showToast(
+                      msg: translation(context).inscriotion_message11,
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                }
+            }
+          }else
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
         }
     }
   }
@@ -474,6 +695,8 @@ class _PiamentState extends State<Piament> {
                 'modele': _modele,
                 'prixJour': _prixJour,
                 'photo': _photo,
+                'caution':_caution,
+                'prix': _prix,
                 'PLEIN ESSENCE': _PLEIN_SSENCE,
                 'DEUXIÈME CONDUCTEUR': _DEUXIEME_CONDUCTEUR,
                 'REHAUSSEUR ( 24-42 MOIS)': _REHAUSSEUR,

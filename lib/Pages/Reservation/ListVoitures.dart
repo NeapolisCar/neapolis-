@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, prefer_const_constructors, no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 
+import '../Classes/Marque.dart';
+
 class ListVoitures extends StatefulWidget {
   const ListVoitures({Key? key}) : super(key: key);
 
@@ -27,14 +30,15 @@ class ListVoitures extends StatefulWidget {
 
 class _ListVoituresState extends State<ListVoitures> {
   List<Voiture> _voitures = [];
+  List<Marquer> _marquer =[];
   List<Options> _Options = [];
   int? _idlisttransfer;
   int? _idlistexurion;
+  bool loading = true;
   String dropdownvalue = "prix_decroissant";
   final List<String> _items = [
     "prix_decroissant",
     "prix_croissant",
-    "plus_de_demande",
   ];
   int _selectedIndex = 0;
   DateTime _dateRamasser = DateTime.now();
@@ -53,6 +57,7 @@ class _ListVoituresState extends State<ListVoitures> {
       await Future.delayed(Duration(seconds: 1));
     }
     fetchVoitures();
+    fetchMarquer();
   }
   void Dialog(String numeroSeries, String modele, String photo) {
     bool _acceptRole = false;
@@ -111,6 +116,9 @@ class _ListVoituresState extends State<ListVoitures> {
                   },
                   child: Text(translation(context).details_voiture_RAn,
                       style:Theme.of(context).textTheme.button),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red[900],
+                  ),
                 ),
                 SizedBox(width: 20),
                 ElevatedButton(
@@ -120,6 +128,9 @@ class _ListVoituresState extends State<ListVoitures> {
                   } : null,
                   child: Text(translation(context).details_voiture_Rbutton,
                       style:Theme.of(context).textTheme.button),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green[900],
+                  ),
                 ),
               ],
             );
@@ -214,71 +225,111 @@ class _ListVoituresState extends State<ListVoitures> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _Options = jsonData.map((json) {
-          return Options.fromJson(json);
-        }).toList();
-      });
-      return showModalBottomSheet(
-        context: context,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-        builder: (context) => Card(
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+          setState(() {
+            _Options = jsonData.map((json) {
+              return Options.fromJson(json);
+            }).toList();
+          });
+          return showModalBottomSheet(
+            context: context,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
-            ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(model),
-                    Image.network(
-                      photo,
-                      width: 152,
-                      height: 99,
-                    ),
-                    // Add spacing between the TableRows
-                    Table(
-                      children: _Options.map((option) => TableRow(
-                        children: [
-                          Row(
-                              children: [
-                                Flexible(
-                                    child: Text(option.title)
-                                ),
-                              ]
-                          ),
-                          SizedBox(height: 10,),
-                          Row(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+            builder: (context) => Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0), // Adjust the radius as needed
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(model),
+                        Image.network(
+                          photo,
+                          width: 152,
+                          height: 99,
+                        ),
+                        // Add spacing between the TableRows
+                        Table(
+                          children: _Options.map((option) => TableRow(
                             children: [
-                              option.descriptions=="true"? SvgPicture.asset(
-                                "assets/images/img_checkmark.svg",
-                                width: 38,
-                                height: 23,
-                              ):
-                              Flexible(
-                                  child:Text(option.descriptions)
+                              Row(
+                                  children: [
+                                    Flexible(
+                                        child: Text(option.title,
+                                            style:Theme.of(context).textTheme.caption)
+                                    ),
+                                  ]
                               ),
+                              SizedBox(height: 10,),
+                              Row(
+                                children: [
+                                  option.descriptions=="true"? SvgPicture.asset(
+                                    "assets/images/img_checkmark.svg",
+                                    width: 38,
+                                    height: 23,
+                                  ):
+                                  Flexible(
+                                      child:Text(option.descriptions,
+                                          style: Theme.of(context).textTheme.caption)
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10,),
                             ],
                           ),
-                          SizedBox(height: 10,),
-                        ],
-                      ),
 
-                      ).toList(),
+                          ).toList(),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            )
+                  ),
+                )
 
-        ),
-      );
+            ),
+          );
+    } break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
-      throw Exception('Failed to load Options');
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -292,7 +343,7 @@ class _ListVoituresState extends State<ListVoitures> {
 
   Future<void> fetchVoitures() async {
     final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Voitures1'),
+      Uri.parse('$ip/polls/AvailableCarsViewSet'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -303,12 +354,44 @@ class _ListVoituresState extends State<ListVoitures> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _voitures = jsonData.map((json) {
-          return Voiture.fromJson(json);
-        }).toList();
-      });
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _voitures = jsonData.map((json) {
+                return Voiture.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
       Fluttertoast.showToast(
           msg: translation(context).inscriotion_message11,
@@ -318,9 +401,92 @@ class _ListVoituresState extends State<ListVoitures> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
+  Future<void> fetchMarquer() async {
+    final response = await http.post(
+      Uri.parse('$ip/polls/Afficher_Marque'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _marquer = jsonData.map((json) {
+                return Marquer.fromJson(json);
+              }).toList();
+              loading=false;
+            });
+            setState(() {
+              _voitures =groupByModele(_voitures);
+            });
+          }
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
+    }
+  }
+  String nom(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.nom;
+  }
+  String logo(id){
+    final marque =_marquer.firstWhere((obj) => obj.id == id);
+    return marque.logo;
+  }
+  List<Voiture> groupByModele(List<Voiture> voitures) {
+    List<Voiture> groupedVoitures = [];
+    String modele = "";
+
+    for (Voiture item in voitures) {
+      if (modele != item.modele) {
+        modele = item.modele;
+        groupedVoitures.add(item);
+      }
+    }
+
+    return groupedVoitures;
+  }
   showSnackBar(String message){
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
@@ -347,10 +513,11 @@ class _ListVoituresState extends State<ListVoitures> {
   }
   @override
   void initState() {
-    super.initState();
     testInternet();
     getData();
     _loadId();
+    super.initState();
+
   }
 
   @override
@@ -426,21 +593,17 @@ class _ListVoituresState extends State<ListVoitures> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: _voitures != null
-                        ? Column(
+                    child: _voitures != null ?  Column(
                       children: _voitures
                           .map(
                             (voiture) =>  InkWell(
                               onTap: () {
-                                voiture.disponibilite ==
-                                    "disponible"
-                                    ? Dialog(
+                                Dialog(
                                   voiture
                                       .numeroSeries,
                                   voiture.modele,
                                   voiture.photo,
-                                )
-                                    : null;
+                                );
                               },
                               child:  Center(
                           child: Stack(
@@ -459,16 +622,20 @@ class _ListVoituresState extends State<ListVoitures> {
                                 Colors.grey.withOpacity(0.3),
                                 child: Row(
                                   children: [
+                                Expanded(
+                                child:
                                     Column(
                                         children: [
                                       Image.network(
                                         voiture.photo,
                                         width: 152,
                                         height: 99,
+                                        errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                        ),
                                       ),
                                       SizedBox(height: 50),
                                       Text(
-                                        voiture.modele == "mercidies"
+                                        nom(voiture.id_marquer) == "Mercidies"
                                             ? (_prixtoul = _prixtoul +
                                             200)
                                             .toString() +
@@ -485,9 +652,8 @@ class _ListVoituresState extends State<ListVoitures> {
                                         ),
                                       ),
                                       SizedBox(height: 40),
-                                      voiture.disponibilite ==
-                                          "disponible"
-                                          ? Row(
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           FaIcon(
                                             FontAwesomeIcons
@@ -499,20 +665,6 @@ class _ListVoituresState extends State<ListVoitures> {
                                           Text(AppLocalizations
                                               .of(context)!
                                               .liste_de_voitures_Disponible),
-                                        ],
-                                      )
-                                          : Row(
-                                        children: [
-                                          FaIcon(
-                                            FontAwesomeIcons
-                                                .cancel,
-                                            color: Colors.red,
-                                            size: 24,
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(AppLocalizations
-                                              .of(context)!
-                                              .liste_de_voitures_NoDisponible),
                                         ],
                                       ),
                                       TextButton(
@@ -544,18 +696,21 @@ class _ListVoituresState extends State<ListVoitures> {
                                           ),
                                         ),
                                       ),
-                                    ]),
+                                    ])
+                                ),
                                     SizedBox(width: 15.0),
+                                  Expanded(
+                                    child:
                                     Column(
                                       crossAxisAlignment:
                                       CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            Text(voiture.marque),
+                                            Text(nom(voiture.id_marquer), style:Theme.of(context).textTheme.bodyText2),
                                             const SizedBox(width: 10,),
                                             Image.network(
-                                              voiture.photoMarque,
+                                              logo(voiture.id_marquer),
                                               width: 50,
                                               height: 50,
                                             ),
@@ -564,9 +719,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                         SizedBox(height: 5),
                                         Text(
                                           voiture.modele,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
+                                          style: Theme.of(context).textTheme.caption
                                         ),
                                         SizedBox(height: 10),
                                         Row(
@@ -580,12 +733,12 @@ class _ListVoituresState extends State<ListVoitures> {
                                               width: 5,
                                             ),
                                             Text(
-                                                voiture.nbSeats +
+                                                voiture.nbSeats.toString() +
                                                     AppLocalizations.of(
                                                         context)!
                                                         .liste_de_voitures_SEATS,
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 11,
                                                 )),
                                             Image.asset(
                                               "assets/images/img_bags1.png",
@@ -596,12 +749,12 @@ class _ListVoituresState extends State<ListVoitures> {
                                               width: 5,
                                             ),
                                             Text(
-                                                voiture.nbBags +
+                                                voiture.nbBags.toString() +
                                                     AppLocalizations.of(
                                                         context)!
                                                         .liste_de_voitures_BAGS,
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 11,
                                                 )),
                                           ],
                                         ),
@@ -617,27 +770,24 @@ class _ListVoituresState extends State<ListVoitures> {
                                               width: 5,
                                             ),
                                             Text(
-                                                voiture.nbPorts +
+                                                voiture.nbPorts.toString() +
                                                     AppLocalizations.of(
                                                         context)!
                                                         .liste_de_voitures_PORTES,
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 11,
                                                 ))
                                           ],
                                         ),
                                         SizedBox(height: 35),
                                         ElevatedButton(
                                           onPressed: () {
-                                            voiture.disponibilite ==
-                                                "disponible"
-                                                ? Dialog(
+                                            Dialog(
                                               voiture
                                                   .numeroSeries,
                                               voiture.modele,
                                               voiture.photo,
-                                            )
-                                                : null;
+                                            );
                                           },
                                           style: ElevatedButton
                                               .styleFrom(
@@ -673,6 +823,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                         ),
                                       ],
                                     )
+                                    )
                                   ],
                                 ),
                               ),
@@ -682,8 +833,7 @@ class _ListVoituresState extends State<ListVoitures> {
                       )
                           .toList(),
                     )
-                        : Center(
-                      child: CircularProgressIndicator(),
+                          :Center(child: Text(translation(context).liste_de_voitures_message1)  ,
                     ),
                   ),
                 ),

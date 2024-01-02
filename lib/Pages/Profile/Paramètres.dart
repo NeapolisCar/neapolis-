@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, unnecessary_null_comparison, unused_local_variable, deprecated_member_use, unnecessary_import, non_constant_identifier_names, prefer_final_fields, prefer_const_constructors, file_names, use_build_context_synchronously, sized_box_for_whitespace, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'package:neapolis_car/Pages/Classes/Client.dart';
@@ -40,34 +41,72 @@ class _ParametresState extends State<Parametres> {
   late int _selectedIndex1=0;
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
-    id = prefs.getInt('id')!;
-    if (id != null) {
-      _selectedIndex1 = 2;
-    }
-    List<Client> client = [];
-    final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Client'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, int>{
-        'id': id,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<Client> client = jsonDecode(response.body)
-          .map<Client>((json) => Client.fromJson(json))
-          .toList();
-      setState(() {
-        _Client = client;
-        if (_Client.isNotEmpty) {
-          _nomprenom = _Client.first.nomprenom;
-          _email = _Client.first.email;
-          _image = _Client.first.photo;
+    if (prefs.containsKey('id')) {
+      id = prefs.getInt('id')!;
+      List<Client> client = [];
+      final response = await http.post(
+        Uri.parse('$ip/polls/Afficher_Client'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, int>{
+          'id': id,
+        }),
+      );
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                  _nomprenom = _Client.first.nomprenom;
+                  _email = _Client.first.email;
+                  _image = _Client.first.photo;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
         }
-      });
-    } else {
-      throw Exception('Failed to load notifications');
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
+      }
     }
   }
 

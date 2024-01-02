@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -46,27 +47,74 @@ class _ResultResrvationState extends State<ResultResrvation> {
   final int _selectedIndex = 0;
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
-    id = prefs.getInt('id')!;
-    final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Client'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, int>{
-        'id': id,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<Client> client = jsonDecode(response.body)
-          .map<Client>((json) => Client.fromJson(json))
-          .toList();
-      setState(() {
-        _Client = client;
-        if (_Client.isNotEmpty) {
+    if (prefs.containsKey('id')) {
+      id = prefs.getInt('id')!;
+      List<Client> client = [];
+      final response = await http.post(
+        Uri.parse('$ip/polls/Afficher_Client'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, int>{
+          'id': id,
+        }),
+      );
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
-      });
-    } else {
-      throw Exception('Failed to load notifications');
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
+      }
     }
   }
 
@@ -253,6 +301,9 @@ class _ResultResrvationState extends State<ResultResrvation> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red[900],
+                  ),
                   child: Text(translation(context).details_voiture_RAn,
                       style:Theme.of(context).textTheme.button),
                 ),
@@ -307,6 +358,11 @@ class _ResultResrvationState extends State<ResultResrvation> {
     _SIEGE_BEBE = arguments['SIÈGE BÉBÉ ( 6-24 MOIS)'] as bool;
     return WillPopScope(
       onWillPop: () async {
+        if(_PLEIN_SSENCE){
+          setState(() {
+            _prixToutal= _prixToutal - 120;
+          });
+        }
         Navigator.pushNamed(context, 'detailVoiture', arguments: {
           'type': _type,
           'dateRamasser': _dateRamasser,
@@ -361,6 +417,8 @@ class _ResultResrvationState extends State<ResultResrvation> {
                                   _photo,
                                   width: 289,
                                   height: 133,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 20,
@@ -614,6 +672,7 @@ class _ResultResrvationState extends State<ResultResrvation> {
                             ],
                           ),
                         ): Text(""),
+                        SizedBox(height: 10),
                         _prix > 0 ?  Card(
                           margin: EdgeInsets.fromLTRB(16, 0, 16, 0),
                           elevation: 5, // This is similar to the spreadRadius in the boxShadow
@@ -664,6 +723,7 @@ class _ResultResrvationState extends State<ResultResrvation> {
                             ],
                           ),
                         ) : Text(""),
+                SizedBox(height: 10),
                 Card(
                   margin: EdgeInsets.fromLTRB(16, 0, 16, 0),
                   elevation: 5, // This is similar to the spreadRadius in the boxShadow

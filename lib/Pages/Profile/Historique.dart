@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:neapolis_car/Pages/Navigation_components/MyDrawer.dart';
 import 'package:neapolis_car/Pages/Navigation_components/userNavbar.dart';
 import 'dart:convert';
@@ -26,6 +27,7 @@ class _HistoriqueState extends State<Historique> {
   late bool value = false;
   late int id = 0;
   bool isInternet = false;
+  bool loading = true;
   List<Demande> _demande = [];
   final TextEditingController _description = TextEditingController();
   Future<void> _fetchDemande(int id) async {
@@ -39,26 +41,63 @@ class _HistoriqueState extends State<Historique> {
       ),
     );
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _demande = jsonData.map((json) {
-          if (json['type'] == "Reservation") {
-            json['address_depart'] = ' ';
-            json['address_fin'] = ' ';
-          } else if (json['type'] == "Transfer") {
-            json['dateDeRevinier'] = ' ';
+      final responseData = jsonDecode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            final List<dynamic> jsonData = responseData['data'];
+            setState(() {
+              _demande = jsonData.map((json) {
+                if (json['type'] == "Reservation") {
+                  json['address_depart'] = ' ';
+                  json['address_fin'] = ' ';
+                } else if (json['type'] == "Transfer") {
+                  json['dateDeRevinier'] = ' ';
+                }
+                return Demande.fromJson(json);
+              }).toList();
+              loading= false;
+            });
           }
-          return Demande.fromJson(json);
-        }).toList();
-      });
+          break;
+        case "Not Exist":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+      }
     } else {
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
       throw Exception('Failed to load voitures');
     }
   }
 
   late int _selectedIndex = 0;
   Future<void> _loadId() async {
-    print("hello");
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('id')) {
       setState(() {
@@ -160,20 +199,63 @@ class _HistoriqueState extends State<Historique> {
       }),
     );
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        _demande = jsonData.map((json) {
-          if (json['type'] == "Reservation") {
-            json['address_depart'] = ' ';
-            json['address_fin'] = ' ';
-          } else if (json['type'] == "Transfer") {
-            json['dateDeRevinier'] = ' ';
+      final responseData = jsonDecode(response.body);
+      switch (responseData['Reponse']) {
+        case "Success":
+          {
+            // final List<dynamic> jsonData = json.decode(response.body);
+            // setState(() {
+            //   _demande = jsonData.map((json) {
+            //     if (json['type'] == "Reservation") {
+            //       json['address_depart'] = ' ';
+            //       json['address_fin'] = ' ';
+            //     } else if (json['type'] == "Transfer") {
+            //       json['dateDeRevinier'] = ' ';
+            //     }
+            //     return Demande.fromJson(json);
+            //   }).toList();
+            // });
+            // Navigator.pushReplacementNamed(context, 'Historique');
+            setState(() {
+              _demande = _demande.where((item) => item.id != id).toList();
+            });
           }
-          return Demande.fromJson(json);
-        }).toList();
-      });
+          break;
+        case "error":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+        case "Faild":
+          {
+            Fluttertoast.showToast(
+                msg: translation(context).inscriotion_message11,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.TOP,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          break;
+      }
     } else {
-      throw Exception('Failed to load voitures');
+      Fluttertoast.showToast(
+          msg: translation(context).inscriotion_message11,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      throw Exception('Failed to load data from the API');
     }
   }
 
@@ -226,7 +308,7 @@ class _HistoriqueState extends State<Historique> {
       ),
       endDrawer: MyDrawer(selectedIndex: 2),
       body: SingleChildScrollView(
-                    child: _demande != null
+                    child:_description!=null
                         ? Column(
                             children: _demande
                                 .map(
@@ -248,35 +330,41 @@ class _HistoriqueState extends State<Historique> {
                                                 Colors.grey.withOpacity(0.3),
                                             child: Row(
                                               children: [
-                                                Column(children: [
-                                                  Image.network(
-                                                    demande.photo,
-                                                    width: 152,
-                                                    height: 99,
-                                                  ),
-                                                  SizedBox(height: 50),
-                                                  Text(
-                                                    AppLocalizations.of(
-                                                                context)!
-                                                            .historique_Prix +
-                                                        (demande.prix)
-                                                            .toString() +
+                                                Expanded(child: Column(
+                                                    children: [
+                                                      demande.photo!=""?
+                                                      Image.network(
+                                                        demande.photo,
+                                                        width: 152,
+                                                        height: 99,
+                                                      ):Image.asset("assets/images/default_image.jpg",
+                                                        width: 152,
+                                                        height: 99,
+                                                      ),
+                                                      SizedBox(height: 50),
+                                                      Text(
                                                         AppLocalizations.of(
+                                                            context)!
+                                                            .historique_Prix +
+                                                            (demande.prix)
+                                                                .toString() +
+                                                            AppLocalizations.of(
                                                                 context)!
-                                                            .liste_de_voitures_prixToutal,
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight:
+                                                                .liste_de_voitures_prixToutal,
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight:
                                                           FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 30),
-                                                  ]
-                                                ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 30),
+                                                    ]
+                                                ),),
+
                                                 SizedBox(width: 15.0),
-                                                Column(
+                                                Expanded(child:Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                                   children: [
                                                     SizedBox(height: 15),
                                                     Text(
@@ -288,7 +376,7 @@ class _HistoriqueState extends State<Historique> {
                                                     SizedBox(height: 10),
                                                     Text(
                                                         AppLocalizations.of(
-                                                                context)!
+                                                            context)!
                                                             .historique_demande,
                                                         style: TextStyle(
                                                           fontSize: 13,
@@ -304,11 +392,11 @@ class _HistoriqueState extends State<Historique> {
                                                     SizedBox(height: 15),
                                                     Column(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      CrossAxisAlignment
+                                                          .start,
                                                       children: [
                                                         Text(AppLocalizations
-                                                                .of(context)!
+                                                            .of(context)!
                                                             .historique_depart),
                                                         Text(
                                                             demande
@@ -320,113 +408,117 @@ class _HistoriqueState extends State<Historique> {
                                                     ),
                                                     SizedBox(height: 10),
                                                     demande.type ==
-                                                            "Reservation"
+                                                        "Reservation"
                                                         ? Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(AppLocalizations
-                                                                      .of(context)!
-                                                                  .historique_fin),
-                                                              Text(
-                                                                  demande
-                                                                      .date_de_revinier,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                  ))
-                                                            ],
-                                                          )
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .start,
+                                                      children: [
+                                                        Text(AppLocalizations
+                                                            .of(context)!
+                                                            .historique_fin),
+                                                        Text(
+                                                            DateTime.parse(demande
+                                                                .date_de_revinier).toString(),
+                                                            style:
+                                                            TextStyle(
+                                                              fontSize:
+                                                              12,
+                                                            ))
+                                                      ],
+                                                    )
                                                         : Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(AppLocalizations
-                                                                      .of(context)!
-                                                                  .historique_Addressdepar),
-                                                              SizedBox(
-                                                                  width: 5),
-                                                              Text(
-                                                                  demande
-                                                                      .address_depart,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                  )),
-                                                              SizedBox(
-                                                                  height: 10),
-                                                             demande.type=="Transfer" ?
-                                                                 Column(
-                                                                   children: [
-                                                                     Text(AppLocalizations
-                                                                         .of(context)!
-                                                                         .historique_Addressarriver),
-                                                                     Text(demande
-                                                                         .address_fin)
-                                                                   ],
-                                                                 )
-                                                             :
-                                                              Text(''),
-                                                            ],
-                                                          ),
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .start,
+                                                      children: [
+                                                        Text(AppLocalizations
+                                                            .of(context)!
+                                                            .historique_Addressdepar),
+                                                        SizedBox(
+                                                            width: 5),
+                                                        Text(
+                                                            demande
+                                                                .address_depart,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 2,
+                                                            style:
+                                                            TextStyle(
+                                                              fontSize:
+                                                              12,
+                                                            )),
+                                                        SizedBox(
+                                                            height: 10),
+                                                        demande.type=="Transfer" ?
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(AppLocalizations
+                                                                .of(context)!
+                                                                .historique_Addressarriver),
+                                                            Text(demande
+                                                                .address_fin)
+                                                          ],
+                                                        )
+                                                            :
+                                                        Text(''),
+                                                      ],
+                                                    ),
                                                     SizedBox(height: 10),
                                                     ElevatedButton(
                                                       onPressed: () {
                                                         demande.etat ==
-                                                                "en attend"
+                                                            "en attend"
                                                             ? Dialog(demande.id)
                                                             : null;
                                                       },
                                                       style: ElevatedButton
                                                           .styleFrom(
                                                         primary: demande.etat ==
-                                                                "en attend"
+                                                            "en attend"
                                                             ? Colors.red
                                                             : Colors.green,
                                                         onPrimary: Colors.black,
                                                         shape:
-                                                            RoundedRectangleBorder(
+                                                        RoundedRectangleBorder(
                                                           side: BorderSide.none,
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10.0),
+                                                          BorderRadius
+                                                              .circular(
+                                                              10.0),
                                                         ),
                                                       ),
                                                       child: Padding(
                                                         padding:
-                                                            EdgeInsets.all(0.0),
+                                                        EdgeInsets.all(0.0),
                                                         child: Text(
                                                           demande.etat ==
-                                                                  "en attend"
+                                                              "en attend"
                                                               ? AppLocalizations
-                                                                      .of(
-                                                                          context)!
-                                                                  .historique_button2
+                                                              .of(
+                                                              context)!
+                                                              .historique_button2
                                                               : AppLocalizations
-                                                                      .of(context)!
-                                                                  .historique_button3,
+                                                              .of(context)!
+                                                              .historique_button3,
                                                           textAlign:
-                                                              TextAlign.center,
+                                                          TextAlign.center,
                                                           style: TextStyle(
                                                             color: Colors.black,
                                                             fontSize: 14,
                                                             fontFamily:
-                                                                'Nunito',
+                                                            'Nunito',
                                                             fontWeight:
-                                                                FontWeight.w400,
+                                                            FontWeight.w400,
                                                             letterSpacing:
-                                                                -0.36,
+                                                            -0.36,
                                                           ),
                                                         ),
                                                       ),
                                                     ),
                                                   ],
-                                                )
+                                                ) ),
+
                                               ],
                                             ),
                                           ),
@@ -437,9 +529,7 @@ class _HistoriqueState extends State<Historique> {
                                 )
                                 .toList(),
                           )
-                        : Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                          :Center(child: Text(translation(context).historique_message2))
                   ),
       bottomNavigationBar: UserNavBar(selectedIndex: _selectedIndex),
       )

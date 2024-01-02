@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:neapolis_car/Pages/Navigation_components/AppBar.dart';
 import 'package:neapolis_car/Pages/Classes/Client.dart';
 import 'dart:async';
@@ -26,31 +27,77 @@ class _RemerciementsState extends State<Remerciements> {
   late String _image = '';
   Future<void> getClient() async {
     final prefs = await SharedPreferences.getInstance();
-    id = prefs.getInt('id')!;
-    List<Client> client = [];
-    final response = await http.post(
-      Uri.parse('$ip/polls/Afficher_Client'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, int>{
-        'id': id,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<Client> client = jsonDecode(response.body)
-          .map<Client>((json) => Client.fromJson(json))
-          .toList();
-      setState(() {
-        _Client = client;
-        if (_Client.isNotEmpty) {
-          _nomprenom = _Client.first.nomprenom;
-          _email = _Client.first.email;
-          _image = _Client.first.photo;
+    if (prefs.containsKey('id')) {
+      id = prefs.getInt('id')!;
+      List<Client> client = [];
+      final response = await http.post(
+        Uri.parse('$ip/polls/Afficher_Client'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, int>{
+          'id': id,
+        }),
+      );
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        switch (responseData['Reponse']) {
+          case "Success":
+            {
+              final List<Client> client = responseData['data']
+                  .map<Client>((json) => Client.fromJson(json))
+                  .toList();
+              setState(() {
+                _Client = client;
+                if (_Client.isNotEmpty) {
+                  _nomprenom = _Client.first.nomprenom;
+                  _email = _Client.first.email;
+                  _image = _Client.first.photo;
+                }
+              });
+            }
+            break;
+          case "Not Exist":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Faild":
+            {
+              Fluttertoast.showToast(
+                  msg: translation(context).inscriotion_message11,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            break;
+          case "Deactivated":
+            {
+              prefs.remove('id');
+            }
+            break;
         }
-      });
-    } else {
-      throw Exception('Failed to load notifications');
+      } else {
+        Fluttertoast.showToast(
+            msg: translation(context).inscriotion_message11,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        throw Exception('Failed to load data from the API');
+      }
     }
   }
 

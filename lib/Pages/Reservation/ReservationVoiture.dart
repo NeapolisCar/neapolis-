@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:neapolis_car/Pages/Compounes/datepicker.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
 
@@ -40,7 +41,6 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
     "sousse",
     "aeroport_enfidha",
     "aeroport_monastir",
-    "aéroport_sfax"
   ];
   late bool value1 = false;
   late double _prix = 0;
@@ -174,7 +174,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: DropdownButton(
                   hint:
-                      Text(translation(context).reservation_Transfer_address1),
+                      Text(translation(context).reservation_voiture_message3),
                   value: dropdownvalue.isNotEmpty ? dropdownvalue : null,
                   onChanged: (newValue) {
                     setState(() {
@@ -187,7 +187,10 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                       child: Row(
                         children: [
                           const Icon(Icons.location_pin),
-                          Text(translation(context).list(value)),
+                          Expanded(child: Text(translation(context).list(value),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ), )
                         ],
                       ),
                     );
@@ -216,7 +219,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: DropdownButton(
                     hint: Text(
-                        translation(context).reservation_Transfer_address1),
+                        translation(context).reservation_voiture_message4),
                     value: dropdownvalue2.isNotEmpty ? dropdownvalue2 : null,
                     onChanged: (newValue) {
                       setState(() {
@@ -230,7 +233,10 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
                         child: Row(
                           children: [
                             const Icon(Icons.location_pin),
-                            Text(translation(context).list(value)),
+                            Expanded(child: Text(translation(context).list(value),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ), )
                           ],
                         ),
                       );
@@ -240,23 +246,89 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
             ),
           ),
           const SizedBox(height: 10),
-          datepicker(
-            date: _date_ramasser,
-            margin: const EdgeInsets.all(16),
-            text: translation(context).reservation_voiture_daterammser,
-            onDateSelected: (selectedDate) {
-              _date_ramasser = selectedDate as TextEditingController;
-            },
+          Card(
+              margin: const EdgeInsets.all(16),
+              child:TextField(
+                  controller: _date_ramasser,
+                  decoration: InputDecoration(
+                    icon:const Padding(
+                      padding: EdgeInsets.only(left: 8.0), // Adjust the padding as needed
+                      child: Icon(Icons.calendar_today),
+                    ),
+                    labelText: translation(context).reservation_voiture_message1,
+                  ),
+                  readOnly: true,
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null) {
+                      TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (pickedTime != null) {DateTime formattedDate = DateTime(
+                        pickedDate.year,
+                        pickedDate.month,
+                        pickedDate.day,
+                        pickedTime.hour,
+                      );
+                      setState(() {
+                        String formattedDateString =
+                        DateFormat('yyyy-MM-dd HH:mm:ss')
+                            .format(formattedDate);
+                        _date_ramasser.text = formattedDateString;
+                      });
+                      } else {}
+                    }
+                  }
+              )
           ),
           const SizedBox(height: 10),
-          datepicker(
-            date: _date_revenir,
+        Card(
             margin: const EdgeInsets.all(16),
-            text: translation(context).reservation_voiture_daterevenir,
-            onDateSelected: (selectedDate) {
-              _date_revenir = selectedDate as TextEditingController;
-            },
-          ),
+            child:TextField(
+                controller: _date_revenir,
+                decoration: InputDecoration(
+                icon:const Padding(
+                    padding: EdgeInsets.only(left: 8.0), // Adjust the padding as needed
+                    child: Icon(Icons.calendar_today),
+                  ),
+                    labelText: translation(context).reservation_voiture_message2,
+                ),
+                readOnly: true,
+                onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null) {
+                    TimeOfDay? pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                    );
+                    if (pickedTime != null) {DateTime formattedDate = DateTime(
+                    pickedDate.year,
+                    pickedDate.month,
+                    pickedDate.day,
+                    pickedTime.hour,
+                );
+                setState(() {
+                String formattedDateString =
+                DateFormat('yyyy-MM-dd HH:mm:ss')
+                    .format(formattedDate);
+                _date_revenir.text = formattedDateString;
+                });
+                } else {}
+              }
+            }
+            )
+            ),
           const SizedBox(height: 32.0),
           ElevatedButton(
             onPressed: () {
