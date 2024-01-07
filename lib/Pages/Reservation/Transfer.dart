@@ -48,14 +48,16 @@ class _TransferState extends State<Transfer> {
   int currentIndex = 0;
   final List<String> _items5 = ["transfer", "exurcion"];
   void InsertList(){
-    String Addres="";
-    for (var  item in _ListTransfer) {
-      if (Addres!= item.addressDepart){
-        Addres=item.addressDepart;
-        setState(() {
-          _items3.add(item.addressDepart );
-          _items4.add(item.addressDepart );
-        });
+    for (var item in _ListTransfer) {
+      String addressDepart = item.addressDepart;
+      String addressFin = item.addressFin;
+
+      if (!_items3.contains(addressDepart)) {
+        _items3.add(addressDepart);
+      }
+
+      if (!_items4.contains(addressFin)) {
+        _items4.add(addressFin);
       }
     }
   }
@@ -268,57 +270,63 @@ class _TransferState extends State<Transfer> {
     }
   }
   void ChangeList1() {
-    if( dropdownvalue3 != "Tunisie" &&  dropdownvalue3!="Hammamet")
-      {
-        setState(() {
-          _items4 = ["Hammamet", "Tunisie"];
-        });
-  }  else{
+    if (dropdownvalue3 != "Tunisie" && dropdownvalue3 != "Hammamet") {
       setState(() {
-        _items4=[];
+        _items4 = ["Hammamet", "Tunisie"];
       });
-      String Addres="";
-      for (var  item in _ListTransfer) {
-        if (Addres!= item.addressDepart){
-          Addres=item.addressDepart;
-          setState(() {
-            _items4.add(item.addressDepart);
-          });
-        }
-      }
-        setState(() {
-         _items4= _items4.where((item) => item !=dropdownvalue3 ).toList();
-        });
+    } else {
+      setState(() {
+        _items4 = [];
+      });
+      Set<String> uniqueItems = _ListTransfer
+          .where((item) => item.addressDepart == dropdownvalue3)
+          .map((item) => item.addressFin)
+          .toSet();
+
+      setState(() {
+        _items4 = List.from(uniqueItems);
+      });
     }
   }
+
+
   void ChangeList2() {
+
     if(dropdownvalue3=="")
     {
-      if (dropdownvalue4 != "Tunisie" || dropdownvalue4 != "Hammamet") {
+      if (dropdownvalue4 == "Tunisie" || dropdownvalue4 ==  "Hammamet") {
+        print("ok");
+        Set<String> uniqueItems = _ListTransfer
+            .where((item) => item.addressFin == dropdownvalue4)
+            .map((item) => item.addressDepart)
+            .toSet();
+
+        setState(() {
+          _items3 = List.from(uniqueItems);
+        });
+        print(_items3);
+
+      } else {
+        // setState(() {
+        //   _items3 = [];
+        // });
         setState(() {
           _items3 = ["Hammamet", "Tunisie"];
         });
-      } else {
-        setState(() {
-          _items3 = [];
-        });
-        String Addres = "";
-        for (var item in _ListTransfer) {
-          if (Addres != item.addressDepart) {
-            Addres = item.addressDepart;
-            setState(() {
-              _items3.add(item.addressDepart);
-            });
-          }
-        }
-        setState(() {
-          _items3 = _items3.where((item) => item != dropdownvalue4).toList();
-        });
       }
     }
-    else if (dropdownvalue4 != "Tunisie" || dropdownvalue4 != "Hammamet"){
+    else if (dropdownvalue4 != "Tunisie" && dropdownvalue4 != "Hammamet") {
       setState(() {
         _items3 = ["Hammamet", "Tunisie"];
+      });
+    } else {
+      Set<String> uniqueItems = _ListTransfer
+          .where((item) => item.addressFin == dropdownvalue4)
+          .map((item) => item.addressDepart)
+          .toSet();
+
+      setState(() {
+        _items3 = List.from(uniqueItems);
       });
     }
   }
@@ -354,7 +362,7 @@ class _TransferState extends State<Transfer> {
           'dateRamasser': dateRamasser,
           'idlisttransfer':Transfers.id,
           'allez_retour': value2,
-          'prixTransfer': Transfers.prix
+          'prixTransfer': value2 ? ((Transfers.prix*2)*0.9) : Transfers.prix
         });
       }
     }

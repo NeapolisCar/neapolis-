@@ -38,6 +38,7 @@ class _ResultaTransferState extends State<ResultaTransfer> {
   int? _idlistexurion;
   String _address_depar="";
   String _address_fin="";
+  String _marquer = "";
   int _selectedIndex = 0;
   void getData() async{
     while (_type=="") {
@@ -338,6 +339,7 @@ class _ResultaTransferState extends State<ResultaTransfer> {
           _numeroSeries = arguments['numeroSeries'] as String;
           _modele = arguments['modele'] as String;
           _photo = arguments['photo'] as String;
+          _marquer =arguments['marquer'] as String;
           _siege_bebe = arguments['SIÈGE BÉBÉ'] as bool;
           _nb_place = arguments['Nombre de place'] as String;
           _nb_bagage = arguments['Nombre de bagages'] as String;
@@ -352,6 +354,7 @@ class _ResultaTransferState extends State<ResultaTransfer> {
           _numeroSeries = arguments['numeroSeries'] as String;
           _modele = arguments['modele'] as String;
           _photo = arguments['photo'] as String;
+          _marquer =arguments['marquer'] as String;
           _nb_place = arguments['Nombre de place'] as String;
           _nb_bagage = arguments['Nombre de bagages'] as String;
         }
@@ -359,6 +362,11 @@ class _ResultaTransferState extends State<ResultaTransfer> {
     }
     return WillPopScope(
         onWillPop: () async {
+          if(_marquer=="Mercedes"){
+            setState(() {
+              _prixtoul = _prixtoul-300;
+            });
+          }
           switch (_type) {
             case "Transfer":
               {

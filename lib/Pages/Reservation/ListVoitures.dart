@@ -59,7 +59,7 @@ class _ListVoituresState extends State<ListVoitures> {
     fetchVoitures();
     fetchMarquer();
   }
-  void Dialog(String numeroSeries, String modele, String photo) {
+  void Dialog(String numeroSeries, String modele, String photo , String marquer) {
     bool _acceptRole = false;
     showDialog(
       context: context,
@@ -124,7 +124,7 @@ class _ListVoituresState extends State<ListVoitures> {
                 ElevatedButton(
                   onPressed: _acceptRole
                       ? () {
-                    Conferme(numeroSeries , modele , photo);
+                    Conferme(numeroSeries , modele , photo , marquer);
                   } : null,
                   child: Text(translation(context).details_voiture_Rbutton,
                       style:Theme.of(context).textTheme.button),
@@ -139,10 +139,7 @@ class _ListVoituresState extends State<ListVoitures> {
       },
     );
   }
-  void Conferme(String numeroSeries, String modele, String photo) {
-    if (modele == "mercidies") {
-      _prixtoul = _prixtoul + 200;
-    }
+  void Conferme(String numeroSeries, String modele, String photo , String marquer) {
     if (_session == true) {
       if (_type == "Transfer") {
         Navigator.pushNamed(context, 'ResultTransfer', arguments: {
@@ -157,6 +154,7 @@ class _ListVoituresState extends State<ListVoitures> {
           'numeroSeries': numeroSeries,
           'modele': modele,
           'photo': photo,
+          'marquer':marquer
         });
       } else {
         Navigator.pushNamed(context, 'ResultTransfer', arguments: {
@@ -170,6 +168,7 @@ class _ListVoituresState extends State<ListVoitures> {
           'numeroSeries': numeroSeries,
           'modele': modele,
           'photo': photo,
+          'marquer':marquer
         });
       }
     } else {
@@ -186,6 +185,7 @@ class _ListVoituresState extends State<ListVoitures> {
           'numeroSeries': numeroSeries,
           'modele': modele,
           'photo': photo,
+          'marquer':marquer
         });
       } else {
         Navigator.pushNamed(context, 'InscriptionTransfer', arguments: {
@@ -199,6 +199,7 @@ class _ListVoituresState extends State<ListVoitures> {
           'numeroSeries': numeroSeries,
           'modele': modele,
           'photo': photo,
+          'marquer':marquer
         });
       }
     }
@@ -213,8 +214,7 @@ class _ListVoituresState extends State<ListVoitures> {
     }
   }
 
-  Future<void> Information(
-      String numeroSeries, String photo, String model) async {
+  Future<void> Information(String numeroSeries, String photo, String model) async {
     final response = await http.post(
       Uri.parse('$ip/polls/Afficher_OptionVoitures'),
       headers: <String, String>{
@@ -364,6 +364,9 @@ class _ListVoituresState extends State<ListVoitures> {
                 return Voiture.fromJson(json);
               }).toList();
               loading=false;
+            });
+            setState(() {
+              _voitures = _voitures.where((voiture) => voiture.nbBags >= _nb_bagage).toList();
             });
           }
           break;
@@ -593,7 +596,7 @@ class _ListVoituresState extends State<ListVoitures> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: _voitures != null ?  Column(
+                    child: (_voitures != null && _marquer!= null) ?  Column(
                       children: _voitures
                           .map(
                             (voiture) =>  InkWell(
@@ -603,6 +606,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                       .numeroSeries,
                                   voiture.modele,
                                   voiture.photo,
+                                  nom(voiture.id_marquer)
                                 );
                               },
                               child:  Center(
@@ -635,9 +639,8 @@ class _ListVoituresState extends State<ListVoitures> {
                                       ),
                                       SizedBox(height: 50),
                                       Text(
-                                        nom(voiture.id_marquer) == "Mercidies"
-                                            ? (_prixtoul = _prixtoul +
-                                            200)
+                                        nom(voiture.id_marquer) == "Mercedes"
+                                            ? (_prixtoul = _prixtoul + 300)
                                             .toString() +
                                             AppLocalizations.of(
                                                 context)!
@@ -787,6 +790,7 @@ class _ListVoituresState extends State<ListVoitures> {
                                                   .numeroSeries,
                                               voiture.modele,
                                               voiture.photo,
+                                                nom(voiture.id_marquer)
                                             );
                                           },
                                           style: ElevatedButton

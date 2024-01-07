@@ -42,6 +42,7 @@ class _ListVoitureState extends State<ListVoiture> {
   int? _days;
   double _prix = 0;
   String _type = "";
+  double _prix_session =0;
   bool isInternet = false;
   bool loading = true;
 
@@ -318,7 +319,7 @@ class _ListVoitureState extends State<ListVoiture> {
         case "Success":
           {
               final String numeroSeries  = responseData['numerSeries'];
-              final prixToutal = prixJour * _days!;
+              final prixToutal = prixJour * _prix_session!;
               Navigator.pushNamed(context, 'detailVoiture', arguments: {
                 'type': _type,
                 'dateRamasser': _dateRamasser,
@@ -454,6 +455,52 @@ class _ListVoitureState extends State<ListVoiture> {
     }
   }
 
+  double calculateTotalPrice(DateTime startDate, DateTime endDate) {
+    DateTime juneStart = DateTime(startDate.year, 6, 1);
+    DateTime juneEnd = DateTime(startDate.year, 6, 30);
+    DateTime julyStart = DateTime(startDate.year, 7, 1);
+    DateTime septemberEnd = DateTime(startDate.year, 9, 15);
+    DateTime currentDay = startDate;
+    double n = 0;
+    if ((startDate.isAfter(juneStart) || startDate.isAtSameMomentAs(juneStart)) &&
+        (endDate.isBefore(juneEnd) || endDate.isAtSameMomentAs(juneEnd))) {
+      return (endDate.difference(startDate).inDays + 1) * 1.5;
+    } else if ((startDate.isAfter(julyStart) || startDate.isAtSameMomentAs(julyStart)) &&
+        (endDate.isBefore(septemberEnd) || endDate.isAtSameMomentAs(septemberEnd))) {
+      return (endDate
+          .difference(startDate)
+          .inDays + 1) * 2;
+    }else {
+      while (currentDay.isBefore(endDate) ||
+          currentDay.isAtSameMomentAs(endDate)) {
+        if ((currentDay.isAfter(juneStart) ||
+            currentDay.isAtSameMomentAs(juneStart)) &&
+            (currentDay.isBefore(juneEnd) ||
+                currentDay.isAtSameMomentAs(juneEnd))) {
+          n += 1.5;
+        } else if ((currentDay.isAfter(julyStart) ||
+            currentDay.isAtSameMomentAs(julyStart)) &&
+            (currentDay.isBefore(septemberEnd) ||
+                currentDay.isAtSameMomentAs(septemberEnd))) {
+          n += 2;
+        } else {
+          n += 1;
+        }
+        currentDay = currentDay.add(Duration(days: 1));
+      }
+      print('Total Price: $n');
+      return n.toDouble();
+    }
+  }
+
+  bool isSummerSeason(DateTime date) {
+    // Define your summer season logic here (e.g., May to August)
+    int month = date.month;
+    return month >= 5 && month <= 8;
+  }
+
+
+
   @override
   void initState() {
     super.initState();
@@ -472,6 +519,8 @@ class _ListVoitureState extends State<ListVoiture> {
     _location_de_revenir = arguments['location_de_revenir'] as String;
     _days = arguments['days'] as int;
     _prix = arguments['prix'] as double;
+    _prix_session = calculateTotalPrice(_dateRamasser, _dateRevenir!);
+    // print('Total Price: $totalPrice');
     return WillPopScope(
         onWillPop: () async {
           Navigator.pushNamed(context, 'reservation');
@@ -527,7 +576,7 @@ class _ListVoitureState extends State<ListVoiture> {
                 Expanded(
                   child: SingleChildScrollView(
                     // ignore: unnecessary_null_comparison
-                    child: (_voitures != null || _marquer!= null)?  Column(
+                    child: (_voitures != null && _marquer!= null)?  Column(
                             children: _voitures
                                 .map(
                                   (voiture) => InkWell(
@@ -562,7 +611,7 @@ class _ListVoitureState extends State<ListVoiture> {
                                               ),
                                               const SizedBox(height: 50),
                                               Text(
-                                                (voiture.prixJour * _days!)
+                                                (voiture.prixJour * _prix_session!)
                                                         .toString() +
                                                     translation(context)
                                                         .liste_de_voitures_prixToutal,

@@ -63,6 +63,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
   double _prixToutal = 0;
   double _prixJour = 0;
   String _modele = "";
+  String _marquer="";
   String _photo = "";
   String _type = "";
   bool _allez_retour = false;
@@ -194,6 +195,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
             'numeroSeries': _numeroSeries,
             'modele': _modele,
             'photo': _photo,
+            'marquer':_marquer
           });
         }
         break;
@@ -210,6 +212,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
             'numeroSeries': _numeroSeries,
             'modele': _modele,
             'photo': _photo,
+            'marquer':_marquer
           });
         }
         break;
@@ -330,6 +333,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
                     'numeroSeries': _numeroSeries,
                     'modele': _modele,
                     'photo': _photo,
+                    'marquer':_marquer
                   });
                 }
                 break;
@@ -346,6 +350,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
                     'numeroSeries': _numeroSeries,
                     'modele': _modele,
                     'photo': _photo,
+                    'marquer':_marquer
                   });
                 }
                 break;
@@ -526,6 +531,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
           _numeroSeries = arguments['numeroSeries'] as String;
           _modele = arguments['modele'] as String;
           _photo = arguments['photo'] as String;
+          _marquer =arguments['marquer'] as String;
           _siege_bebe = arguments['SIÈGE BÉBÉ'] as bool;
           _nb_place = arguments['Nombre de place'] as String;
           _nb_bagage = arguments['Nombre de bagages'] as String;
@@ -539,6 +545,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
           _numeroSeries = arguments['numeroSeries'] as String;
           _modele = arguments['modele'] as String;
           _photo = arguments['photo'] as String;
+          _marquer =arguments['marquer'] as String;
           _siege_bebe = arguments['SIÈGE BÉBÉ'] as bool;
           _nb_place = arguments['Nombre de place'] as String;
           _nb_bagage = arguments['Nombre de bagages'] as String;
@@ -547,13 +554,18 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
     }
     return WillPopScope(
         onWillPop: () async {
+          if(_marquer=="Mercedes"){
+            setState(() {
+              _prixtoul = _prixtoul-300;
+            });
+          }
           if(_type=="Transfer") {
             Navigator.pushNamed(context, 'listVoitures', arguments: {
               'type': _type,
               'dateRamasser': _dateRamasser,
               'allez_retour': _allez_retour,
               'idlisttransfer': _idlisttransfer,
-              'prixTransfer': _prixToutal,
+              'prixTransfer': _prixtoul,
               'SIÈGE BÉBÉ': _siege_bebe,
               'Nombre de place': _nb_place,
               'Nombre de bagages': _nb_bagage,
@@ -564,7 +576,7 @@ class _InscriptionTransferState extends State<InscriptionTransfer> {
               'type': _type,
               'dateRamasser': _dateRamasser,
               'idlistexurion': _idlistexurion,
-              'prixTransfer': _prixToutal,
+              'prixTransfer': _prixtoul,
               'SIÈGE BÉBÉ': _siege_bebe,
               'Nombre de place': _nb_place,
               'Nombre de bagages': _nb_bagage,

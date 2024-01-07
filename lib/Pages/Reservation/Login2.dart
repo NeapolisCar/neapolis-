@@ -23,6 +23,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
   String _numeroSeries = "";
   String _modele = "";
   String _photo = "";
+  String _marquer="";
   String _type = "";
   bool _email1= false;
   bool password = false;
@@ -107,6 +108,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
                       'numeroSeries': _numeroSeries,
                       'modele': _modele,
                       'photo': _photo,
+                      'marquer':_marquer
                     });
                   }
                   break;
@@ -123,6 +125,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
                       'numeroSeries': _numeroSeries,
                       'modele': _modele,
                       'photo': _photo,
+                      'marquer':_marquer
                     });
                   }
                   break;
@@ -206,6 +209,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
             'numeroSeries': _numeroSeries,
             'modele': _modele,
             'photo': _photo,
+            'marquer':_marquer
           });
         }
         break;
@@ -222,6 +226,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
             'numeroSeries': _numeroSeries,
             'modele': _modele,
             'photo': _photo,
+            'marquer':_marquer
           });
         }
         break;
@@ -251,6 +256,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
           _siege_bebe = arguments['SIÈGE BÉBÉ'] as bool;
           _nb_place = arguments['Nombre de place'] as String;
           _nb_bagage = arguments['Nombre de bagages'] as String;
+          _marquer =arguments['marquer'] as String;
         }
         break;
       case "Exurcion":
@@ -264,6 +270,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
           _siege_bebe = arguments['SIÈGE BÉBÉ'] as bool;
           _nb_place = arguments['Nombre de place'] as String;
           _nb_bagage = arguments['Nombre de bagages'] as String;
+          _marquer =arguments['marquer'] as String;
         }
         break;
     }
@@ -284,6 +291,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
               'numeroSeries': _numeroSeries,
               'modele': _modele,
               'photo': _photo,
+              'marquer':_marquer
             });
           }
           break;
@@ -300,6 +308,7 @@ class _LoginTrnasferState extends State<LoginTrnasfer> {
               'numeroSeries': _numeroSeries,
               'modele': _modele,
               'photo': _photo,
+              'marquer':_marquer
             });
           }
           break;
