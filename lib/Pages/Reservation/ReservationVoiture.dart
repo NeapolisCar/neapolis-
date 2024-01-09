@@ -56,7 +56,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
   }
 
   bool isDateMin3DaysAfter(DateTime startDate, DateTime endDate) {
-    final difference = endDate.difference(startDate).inDays;
+    final difference = endDate.difference(startDate).inDays+1;
     return difference >= 3;
   }
 
@@ -110,7 +110,7 @@ class _ReservationVoitureState extends State<ReservationVoiture> {
             isDateMin3DaysAfter(dateRamasser, dateRevenir);
         if (isRamasserTodayOrFuture) {
           if (isRevenirMin3DaysAfterRamasser) {
-            final int difference = dateRevenir.difference(dateRamasser).inDays;
+            final int difference = dateRevenir.difference(dateRamasser).inDays+1;
             switch (dropdownvalue) {
               case "monastir_2":
                 {

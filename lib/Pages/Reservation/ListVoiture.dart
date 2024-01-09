@@ -16,6 +16,9 @@ import 'package:neapolis_car/Pages/Classes/OptionsVoiture.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:neapolis_car/main.dart';
 import 'package:neapolis_car/Pages/Classes/language_constants.dart';
+import '../Compounes/Card.dart';
+import '../Compounes/skeleton.dart';
+import '../Compounes/constants.dart';
 
 class ListVoiture extends StatefulWidget {
   const ListVoiture({Key? key}) : super(key: key);
@@ -193,13 +196,10 @@ class _ListVoitureState extends State<ListVoiture> {
           {
             final List<dynamic> jsonData = responseData['data'];
             setState(() {
-              _voitures = jsonData.map((json) {
+              _voitures =groupByModele(jsonData.map((json) {
                 return Voiture.fromJson(json);
-              }).toList();
+              }).toList());
               loading=false;
-            });
-            setState(() {
-              _voitures =groupByModele(_voitures);
             });
           }
           break;
@@ -397,17 +397,13 @@ class _ListVoitureState extends State<ListVoiture> {
     return marque.logo;
   }
   List<Voiture> groupByModele(List<Voiture> voitures) {
-    List<Voiture> groupedVoitures = [];
-    String modele = "";
+    Map<String, Voiture> groupedMap = {};
 
     for (Voiture item in voitures) {
-      if (modele != item.modele) {
-        modele = item.modele;
-        groupedVoitures.add(item);
-      }
+      groupedMap[item.modele] = item;
     }
 
-    return groupedVoitures;
+    return groupedMap.values.toList();
   }
   void sortVoituresByPrice() {
     _voitures.sort((a, b) => a.prixJour.compareTo(b.prixJour));
@@ -456,34 +452,117 @@ class _ListVoitureState extends State<ListVoiture> {
   }
 
   double calculateTotalPrice(DateTime startDate, DateTime endDate) {
-    DateTime juneStart = DateTime(startDate.year, 6, 1);
-    DateTime juneEnd = DateTime(startDate.year, 6, 30);
+    int days = (startDate.year -2024) *11;
+    DateTime Eid1Start = DateTime(startDate.year , 4 , 5).subtract(Duration(days: days));
+    DateTime Eid1End = DateTime(startDate.year , 6 , 10).subtract(Duration(days: days));
+    DateTime Eid2Start = DateTime(startDate.year , 6 ,10).subtract(Duration(days: days));
+    DateTime Eid2End = DateTime(startDate.year , 6 , 20).subtract(Duration(days: days));
+    DateTime session1Start = DateTime(startDate.year, 6, 1);
+    DateTime session1End = DateTime(startDate.year, 6, 20);
+    DateTime session2Start = DateTime(startDate.year , 6 , 21);
+    DateTime session2End = DateTime(startDate.year , 7,10 );
+    DateTime session3Start = DateTime(startDate.year , 7 , 11);
+    DateTime session3End = DateTime(startDate.year , 8 , 10);
+    DateTime session4Start = DateTime(startDate.year , 8 , 11);
+    DateTime session4End = DateTime(startDate.year , 9,15 );
+    DateTime session5Start = DateTime(startDate.year , 12 , 15  );
+    DateTime session5End = DateTime(startDate.year+1 , 1, 5);
     DateTime julyStart = DateTime(startDate.year, 7, 1);
     DateTime septemberEnd = DateTime(startDate.year, 9, 15);
     DateTime currentDay = startDate;
     double n = 0;
-    if ((startDate.isAfter(juneStart) || startDate.isAtSameMomentAs(juneStart)) &&
-        (endDate.isBefore(juneEnd) || endDate.isAtSameMomentAs(juneEnd))) {
-      return (endDate.difference(startDate).inDays + 1) * 1.5;
-    } else if ((startDate.isAfter(julyStart) || startDate.isAtSameMomentAs(julyStart)) &&
-        (endDate.isBefore(septemberEnd) || endDate.isAtSameMomentAs(septemberEnd))) {
+    if ((startDate.isAfter(session1Start) ||
+        startDate.isAtSameMomentAs(session1Start)) &&
+        (endDate.isBefore(session1End) ||
+            endDate.isAtSameMomentAs(session1End))) {
+      return (endDate
+          .difference(startDate)
+          .inDays + 1) * 1.5;
+    } else if ((startDate.isAfter(session2Start) ||
+        startDate.isAtSameMomentAs(session2Start)) &&
+        (endDate.isBefore(session2End) ||
+            endDate.isAtSameMomentAs(session2End))) {
       return (endDate
           .difference(startDate)
           .inDays + 1) * 2;
-    }else {
+    } else if ((startDate.isAfter(session3Start) ||
+        startDate.isAtSameMomentAs(session3Start)) &&
+        (endDate.isBefore(session4End) ||
+            endDate.isAtSameMomentAs(session4End))) {
+      return (endDate
+          .difference(startDate)
+          .inDays + 1) * 2.2;
+    }
+    else if ((startDate.isAfter(session4Start) ||
+        startDate.isAtSameMomentAs(session4Start)) &&
+        (endDate.isBefore(session4End) ||
+            endDate.isAtSameMomentAs(session4End))) {
+      return (endDate
+          .difference(startDate)
+          .inDays + 1) * 1.9;
+    }
+    else if ((startDate.isAfter(session5Start) ||
+        startDate.isAtSameMomentAs(session5Start)) &&
+        (endDate.isBefore(session5End) ||
+            endDate.isAtSameMomentAs(session5End))) {
+      return (endDate
+          .difference(startDate)
+          .inDays + 1) * 1.5;
+    } else if ((startDate.isAfter(session1Start) ||
+        startDate.isAtSameMomentAs(session1Start)) &&
+        (endDate.isBefore(session1End) ||
+            endDate.isAtSameMomentAs(session1End))) {
+      return (endDate
+          .difference(startDate)
+          .inDays + 1) * 1.5;
+    } else  if ((startDate.isAfter(Eid1Start) || startDate.isAtSameMomentAs(Eid1Start)) &&
+        (endDate.isBefore(Eid1End) || endDate.isAtSameMomentAs(Eid1End))) {
+      return (endDate.difference(startDate).inDays + 1) * 1.5;
+    } else if ((startDate.isAfter(Eid2Start) || startDate.isAtSameMomentAs(Eid2Start)) &&
+        (endDate.isBefore(Eid2End) || endDate.isAtSameMomentAs(Eid2End))) {
+      return (endDate.difference(startDate).inDays + 1) * 1.5;
+    } else {
       while (currentDay.isBefore(endDate) ||
           currentDay.isAtSameMomentAs(endDate)) {
-        if ((currentDay.isAfter(juneStart) ||
-            currentDay.isAtSameMomentAs(juneStart)) &&
-            (currentDay.isBefore(juneEnd) ||
-                currentDay.isAtSameMomentAs(juneEnd))) {
+        if ((currentDay.isAfter(session1Start) ||
+            currentDay.isAtSameMomentAs(session1Start)) &&
+            (currentDay.isBefore(session1End) ||
+                currentDay.isAtSameMomentAs(session1End))) {
           n += 1.5;
-        } else if ((currentDay.isAfter(julyStart) ||
-            currentDay.isAtSameMomentAs(julyStart)) &&
-            (currentDay.isBefore(septemberEnd) ||
-                currentDay.isAtSameMomentAs(septemberEnd))) {
+        } else if ((currentDay.isAfter(session2Start) ||
+            currentDay.isAtSameMomentAs(session2Start)) &&
+            (currentDay.isBefore(session2End) ||
+                currentDay.isAtSameMomentAs(session2End))) {
           n += 2;
-        } else {
+        } else if ((currentDay.isAfter(session3Start) ||
+            currentDay.isAtSameMomentAs(session3Start)) &&
+            (currentDay.isBefore(session3End) ||
+                currentDay.isAtSameMomentAs(session3End))) {
+          n += 2.2;
+        }
+        else if ((currentDay.isAfter(session4Start) ||
+            currentDay.isAtSameMomentAs(session4Start)) &&
+            (currentDay.isBefore(session4End) ||
+                currentDay.isAtSameMomentAs(session4End))) {
+          n += 1.9;
+        }
+        else if ((currentDay.isAfter(session5Start) ||
+            currentDay.isAtSameMomentAs(session5Start)) &&
+            (currentDay.isBefore(session5End) ||
+                currentDay.isAtSameMomentAs(session5End))) {
+          n += 1.5;
+        }
+        else if ((currentDay.isAfter(Eid1Start) ||
+            currentDay.isAtSameMomentAs(Eid1Start)) &&
+            (currentDay.isBefore(Eid1End) ||
+                currentDay.isAtSameMomentAs(Eid1End))) {
+          n += 1.5;}
+        else if ((currentDay.isAfter(Eid2Start) ||
+            currentDay.isAtSameMomentAs(Eid2Start)) &&
+            (currentDay.isBefore(Eid2End) ||
+                currentDay.isAtSameMomentAs(Eid2End))) {
+          n += 1.5;}
+        else {
           n += 1;
         }
         currentDay = currentDay.add(Duration(days: 1));
@@ -684,6 +763,8 @@ class _ListVoitureState extends State<ListVoiture> {
                                                       logo(voiture.id_marquer),
                                                       width: 50,
                                                       height: 50,
+                                                      errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -792,7 +873,12 @@ class _ListVoitureState extends State<ListVoiture> {
                                       ),
                                   )
                             ).toList(),
-                          ) :Center(child: Text(translation(context).liste_de_voitures_message1)),
+                          ) :ListView.separated(
+                      itemCount: 5,
+                      itemBuilder: (context, index) => const NewsCardSkelton(),
+                      separatorBuilder: (context, index) =>
+                      const SizedBox(height: defaultPadding),
+                    ),
                   ),
                 ),
               ],

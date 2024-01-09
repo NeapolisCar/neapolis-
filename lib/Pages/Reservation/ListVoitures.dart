@@ -478,17 +478,13 @@ class _ListVoituresState extends State<ListVoitures> {
     return marque.logo;
   }
   List<Voiture> groupByModele(List<Voiture> voitures) {
-    List<Voiture> groupedVoitures = [];
-    String modele = "";
+    Map<String, Voiture> groupedMap = {};
 
     for (Voiture item in voitures) {
-      if (modele != item.modele) {
-        modele = item.modele;
-        groupedVoitures.add(item);
-      }
+      groupedMap[item.modele] = item;
     }
 
-    return groupedVoitures;
+    return groupedMap.values.toList();
   }
   showSnackBar(String message){
     final snackBar = SnackBar(
@@ -716,6 +712,8 @@ class _ListVoituresState extends State<ListVoitures> {
                                               logo(voiture.id_marquer),
                                               width: 50,
                                               height: 50,
+                                              errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/default_image.jpg",
+                                              ),
                                             ),
                                           ],
                                         ),
